@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+
+//this script is responsible for picking up which tool you have
+//it also sets which kind of tools there are.
 public class ToolHandler : MonoBehaviour
 {
     public enum ToolType{
@@ -12,11 +15,17 @@ public class ToolHandler : MonoBehaviour
         Weapon
     }
 
-    private ToolType currentToolType;
+    private ToolGenericHandler currentToolType;
 
     [SerializeField] private Image pickAxeIsOn;
     [SerializeField] private Image axeIsOn;
     [SerializeField] private Image weaponIsOn;
+
+    [SerializeField] private ToolGenericHandler axe;
+    [SerializeField] private ToolGenericHandler pickAxe;
+    [SerializeField] private ToolGenericHandler weapon;
+
+
 
     void Start(){
         setIsOn(axeIsOn);
@@ -28,8 +37,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 1 key
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if(currentToolType != ToolType.Axe){
-                currentToolType = ToolType.Axe;
+            if(currentToolType != axe){
+                currentToolType = axe;
                 setIsOn(axeIsOn);
             }
         }
@@ -37,8 +46,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 2 key
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if(currentToolType != ToolType.PickAxe){
-                currentToolType = ToolType.PickAxe;
+            if(currentToolType != pickAxe){
+                currentToolType = pickAxe;
                 setIsOn(pickAxeIsOn);
             }
             // Call a function or perform an action related to key 2
@@ -47,15 +56,15 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 3 key
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if(currentToolType != ToolType.Weapon){
-                currentToolType = ToolType.Weapon;
+            if(currentToolType != weapon){
+                currentToolType = weapon;
                 setIsOn(weaponIsOn);
             }
             // Call a function or perform an action related to key 3
         }
     }
 
-    public ToolType getToolType(){
+    public ToolGenericHandler getCurrentTool(){
         return currentToolType;
     }
 
