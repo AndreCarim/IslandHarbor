@@ -15,7 +15,7 @@ public class ToolHandler : MonoBehaviour
         Weapon
     }
 
-    private ToolGenericHandler currentToolType;
+    private ToolGenericHandler currentTool;
 
     [SerializeField] private Image pickAxeIsOn;
     [SerializeField] private Image axeIsOn;
@@ -28,6 +28,7 @@ public class ToolHandler : MonoBehaviour
 
 
     void Start(){
+        currentTool = axe;
         setIsOn(axeIsOn);
     }
 
@@ -37,8 +38,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 1 key
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if(currentToolType != axe){
-                currentToolType = axe;
+            if(currentTool != axe){
+                currentTool = axe;
                 setIsOn(axeIsOn);
             }
         }
@@ -46,8 +47,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 2 key
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if(currentToolType != pickAxe){
-                currentToolType = pickAxe;
+            if(currentTool != pickAxe){
+                currentTool = pickAxe;
                 setIsOn(pickAxeIsOn);
             }
             // Call a function or perform an action related to key 2
@@ -56,8 +57,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 3 key
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if(currentToolType != weapon){
-                currentToolType = weapon;
+            if(currentTool != weapon){
+                currentTool = weapon;
                 setIsOn(weaponIsOn);
             }
             // Call a function or perform an action related to key 3
@@ -65,7 +66,7 @@ public class ToolHandler : MonoBehaviour
     }
 
     public ToolGenericHandler getCurrentTool(){
-        return currentToolType;
+        return currentTool;
     }
 
     private void setIsOn(Image isOnUI)

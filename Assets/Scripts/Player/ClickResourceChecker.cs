@@ -4,7 +4,7 @@ using UnityEngine.UI; // Import the Unity UI namespace
 
 public class ClickResourceChecker : MonoBehaviour
 {
-    [SerializeField] private float maxDistance = 2f;
+    [SerializeField] private float maxDistance = 5f;
     [SerializeField] private ToolHandler toolHandler;
     [SerializeField] private Slider cooldownSlider; // Reference to the UI Slider
 
