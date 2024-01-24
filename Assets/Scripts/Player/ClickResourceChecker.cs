@@ -8,6 +8,8 @@ public class ClickResourceChecker : MonoBehaviour
     [SerializeField] private ToolHandler toolHandler;
     [SerializeField] private Slider cooldownSlider; // Reference to the UI Slider
 
+    [SerializeField] private GameObject player;
+
     private bool canClick = true;
 
     void Start()
@@ -41,7 +43,7 @@ public class ClickResourceChecker : MonoBehaviour
                             if (resourceHandler)
                             {
                                 ToolGenericHandler currentTool = toolHandler.getCurrentTool();
-                                resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getToolType());
+                                resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getToolType(), player);
                             }
                         }
                     }
@@ -75,4 +77,6 @@ public class ClickResourceChecker : MonoBehaviour
         // Reset the canClick flag after the cooldown
         canClick = true;
     }
+
+    
 }

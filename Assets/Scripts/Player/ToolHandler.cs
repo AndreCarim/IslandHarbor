@@ -9,26 +9,20 @@ using TMPro;
 //it also sets which kind of tools there are.
 public class ToolHandler : MonoBehaviour
 {
-    public enum ToolType{
-        Axe,
-        PickAxe,
-        Weapon
-    }
-
     private ToolGenericHandler currentTool;
 
     [SerializeField] private Image pickAxeIsOn;
     [SerializeField] private Image axeIsOn;
     [SerializeField] private Image weaponIsOn;
 
-    [SerializeField] private ToolGenericHandler axe;
-    [SerializeField] private ToolGenericHandler pickAxe;
-    [SerializeField] private ToolGenericHandler weapon;
+    [SerializeField] private ToolGenericHandler currentAxe;
+    [SerializeField] private ToolGenericHandler currentPickAxe;
+    [SerializeField] private ToolGenericHandler currentWeapon;
 
 
 
     void Start(){
-        currentTool = axe;
+        currentTool = currentAxe;
         setIsOn(axeIsOn);
     }
 
@@ -38,8 +32,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 1 key
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if(currentTool != axe){
-                currentTool = axe;
+            if(currentTool != currentAxe){
+                currentTool = currentAxe;
                 setIsOn(axeIsOn);
             }
         }
@@ -47,8 +41,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 2 key
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if(currentTool != pickAxe){
-                currentTool = pickAxe;
+            if(currentTool != currentPickAxe){
+                currentTool = currentPickAxe;
                 setIsOn(pickAxeIsOn);
             }
             // Call a function or perform an action related to key 2
@@ -57,8 +51,8 @@ public class ToolHandler : MonoBehaviour
         // Check if the player pressed the 3 key
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if(currentTool != weapon){
-                currentTool = weapon;
+            if(currentTool != currentWeapon){
+                currentTool = currentWeapon;
                 setIsOn(weaponIsOn);
             }
             // Call a function or perform an action related to key 3
@@ -76,5 +70,17 @@ public class ToolHandler : MonoBehaviour
         weaponIsOn.color = new Color(weaponIsOn.color.r, weaponIsOn.color.g, weaponIsOn.color.b, 0f);
 
         isOnUI.color = new Color(isOnUI.color.r, isOnUI.color.g, isOnUI.color.b, 1f);
+    }
+
+    public ToolGenericHandler getCurrentAxe(){
+        return currentAxe;
+    }
+
+    public ToolGenericHandler getCurrentPickAxe(){
+        return currentAxe;
+    }
+    
+    public ToolGenericHandler getCurrentWeapon(){
+        return currentAxe;
     }
 }

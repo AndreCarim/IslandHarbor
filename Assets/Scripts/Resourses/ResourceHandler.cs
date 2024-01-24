@@ -1,21 +1,31 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class ResourceHandler : MonoBehaviour
 {
     [SerializeField] private double startHealth;
-    [SerializeField] private double currentHealth;
+    private double currentHealth;
 
     private Material defaultMaterial;
     private Material blinkMaterial;
 
-    [SerializeField] private int secondsToRespawnFrom;
-    [SerializeField] private int secondsToRespawnTo;
+    [SerializeField] private ResourceGenericHandler resourceDrop;
 
-    [SerializeField] private int amountDroppedFrom;
-    [SerializeField] private int amountDroppedTo;
+    [SerializeField] private int amountDropFrom = 1;
+    [SerializeField] private int amountDropTo = 1;
 
-    [SerializeField] private ToolHandler.ToolType toolType;
+    [Tooltip("Leave -1 to simply destroy the resource")]
+    [SerializeField] private float secondsToRespawnFrom = -1;
+    
+    [Tooltip("Leave -1 to simply destroy the resource")]
+    [SerializeField] private float secondsToRespawnTo = -1;
+    
+
+    [SerializeField] private ToolEnum.ToolType toolType;
+
+
+    
 
     private Renderer resourceRenderer; // Reference to the resource renderer
 
@@ -36,31 +46,32 @@ public class ResourceHandler : MonoBehaviour
         }
     }
 
-    public void giveDamage(double damageAmount, ToolHandler.ToolType toolTypeUsed)
+    public void giveDamage(double damageAmount, ToolEnum.ToolType toolTypeUsed, GameObject player)
     {
         if (currentHealth > 0)
         {
             if (toolTypeUsed == toolType)
             {
                 currentHealth -= damageAmount;
-                Debug.Log(currentHealth);
             }
             else
             {
                 currentHealth -= (damageAmount / 2);
-                Debug.Log(currentHealth);
             }
-
+            //Debug.Log(currentHealth);
             StartCoroutine(Effects());
-            checkHealthStats();
+            checkHealthStats(player);
         }
     }
 
-    private void checkHealthStats()
+    private void checkHealthStats(GameObject player)
     {
         if (currentHealth <= 0)
         {
-            Debug.Log("Resource is dead");
+            //resource died
+            // Get a random number between amountDropFrom (inclusive) and amountDropTo (exclusive)
+            int randomAmount = Random.Range(amountDropFrom, amountDropTo + 1);
+            player.GetComponent<ResourceInventory>().AddResource(resourceDrop, randomAmount);
         }
     }
 
@@ -105,5 +116,7 @@ public class ResourceHandler : MonoBehaviour
             Debug.LogError("ResourceHandler: Resource Renderer not found on the same GameObject!");
         }
     }
+
+    
 
 }
