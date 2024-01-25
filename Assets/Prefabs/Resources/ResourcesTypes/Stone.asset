@@ -10,8 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51216d91b8dd441b480c96b298912413, type: 3}
-  m_Name: 1
+  m_Name: Stone
   m_EditorClassIdentifier: 
-  resourceName: Wood
-  icon: {fileID: 21300000, guid: 5a30239fa215d084dbc129eda36ddd73, type: 3}
-  id: 1
+  resourceName: Stone
+  icon: {fileID: 21300000, guid: 08387fb8dd436204d8931d40f3c07f5a, type: 3}
+  id: 2
+  dropGameObject: {fileID: 4872178930830419935, guid: e5518f69ae5c14d3b9cbde37e442f840, type: 3}
+  maxAmountInInventory: 999

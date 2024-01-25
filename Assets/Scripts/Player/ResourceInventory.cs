@@ -15,7 +15,42 @@ public class ResourceInventory : MonoBehaviour
     [SerializeField] private GameObject resourceUIPrefab;
     [SerializeField] private Transform resourceUIParent;
 
+    [SerializeField] private GameObject inventoryUI; // Reference to the inventory UI panel
+
     private Dictionary<int, GameObject> resourceUIDictionary = new Dictionary<int, GameObject>();
+
+    [SerializeField] private FirstPersonCameraHandler cameraScript;
+    [SerializeField] private Movement movementScript;
+    [SerializeField] private ClickResourceChecker clickScript;
+
+    [SerializeField] private GameObject toolTip;
+    [SerializeField] private RectTransform canvasRectTransform;
+
+    void Update()
+    {
+        // Check if the player presses the Tab or I key
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.I))
+        {
+            // Toggle the visibility of the inventory UI panel
+            bool isOpen = !inventoryUI.activeSelf;
+            inventoryUI.SetActive(isOpen);
+
+             // Call different functions based on the inventory state
+            if (isOpen)
+            {
+                cameraScript.setIsFreeToLook(false); //lock the mouse
+                movementScript.setCanWalk(false); // lock walking
+                clickScript.setInventoryIsOpen(true); // lock clicking
+            }
+            else
+            {
+                cameraScript.setIsFreeToLook(true); // unlock the mouse
+                movementScript.setCanWalk(true); // unlock the walk
+                clickScript.setInventoryIsOpen(false); // unlock clicking
+                toolTip.SetActive(false);
+            }
+        }
+    }
 
     // Method to add a resource to the inventory
     public void AddResource(ResourceGenericHandler resource, int amount)
@@ -81,6 +116,7 @@ public class ResourceInventory : MonoBehaviour
             // Update UI elements (image, text) based on resource data
             GameObject iconObject = newResourceUI.transform.Find("Icon").gameObject; // Assuming "icon" is the name of the child object
             Image iconImage = iconObject.GetComponent<Image>();
+            newResourceUI.GetComponent<HoverOverResource>().setOnCreate(toolTip, canvasRectTransform, resource);
 
             // Debug: Check if the sprite is not null
             if (resource.getIcon() != null)
@@ -94,8 +130,6 @@ public class ResourceInventory : MonoBehaviour
 
             UpdateResourceUI(newResourceUI, amount);
         }
-
-        Debug.Log(resourceCountDictionary[resource.getId()]);
     }
 
     // Method to update UI for a resource

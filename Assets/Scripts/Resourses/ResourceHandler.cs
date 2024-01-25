@@ -64,16 +64,88 @@ public class ResourceHandler : MonoBehaviour
         }
     }
 
-    private void checkHealthStats(GameObject player)
+   private void checkHealthStats(GameObject player)
     {
         if (currentHealth <= 0)
         {
-            //resource died
+            // Resource died
             // Get a random number between amountDropFrom (inclusive) and amountDropTo (exclusive)
             int randomAmount = Random.Range(amountDropFrom, amountDropTo + 1);
-            player.GetComponent<ResourceInventory>().AddResource(resourceDrop, randomAmount);
+
+            // Get the collider of the original GameObject
+            Collider collider = GetComponent<Collider>();
+
+            // Check if a collider is found
+            if (collider != null)
+            {
+                // Disable colliders to prevent interactions
+                collider.enabled = false;
+
+                // Calculate the center of the GameObject
+                Vector3 center = CalculateGameObjectCenter();
+
+                // Check if the calculated center is valid
+                if (!float.IsNaN(center.x) && !float.IsNaN(center.y) && !float.IsNaN(center.z))
+                {
+                    // Instantiate the item at the center of the original GameObject
+                    GameObject droppedItem = Instantiate(resourceDrop.getDropGameObject(), center, Quaternion.identity);
+                    droppedItem.AddComponent<FloatingResource>();
+
+                    droppedItem.GetComponent<FloatingResource>().setResource(randomAmount, resourceDrop);
+
+                    // Access the ResourceInventory component of the player and add the resource
+                    player.GetComponent<ResourceInventory>().AddResource(resourceDrop, randomAmount);
+
+                    // Enable colliders after instantiation
+                    collider.enabled = true;
+
+                    // Destroy the original GameObject
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    Debug.LogWarning("Invalid center position. Unable to instantiate dropped item.");
+                    // Enable colliders since instantiation failed
+                    collider.enabled = true;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Collider not found on the original GameObject. Ensure a collider is attached.");
+            }
         }
     }
+
+    private Vector3 CalculateGameObjectCenter()
+    {
+        // Get the renderer of the original GameObject
+        Renderer renderer = GetComponent<Renderer>();
+
+        // Check if a renderer is found
+        if (renderer != null)
+        {
+            // Calculate the center of the renderer's bounds
+            return renderer.bounds.center;
+        }
+        else
+        {
+            // If no renderer is found, return the position of the GameObject
+            return transform.position;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     IEnumerator Effects()
     {

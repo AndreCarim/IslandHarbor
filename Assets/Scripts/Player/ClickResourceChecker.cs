@@ -11,6 +11,7 @@ public class ClickResourceChecker : MonoBehaviour
     [SerializeField] private GameObject player;
 
     private bool canClick = true;
+    private bool inventoryIsOpen = false;
 
     void Start()
     {
@@ -19,10 +20,9 @@ public class ClickResourceChecker : MonoBehaviour
 
     void Update()
     {
-        // Check if the player is holding down the left mouse button
-        if (Input.GetMouseButton(0) && toolHandler.getCurrentTool() != null)
-        {
-            if (canClick)
+        if(canClick && inventoryIsOpen == false){
+            // Check if the player is holding down the left mouse button
+            if (Input.GetMouseButton(0) && toolHandler.getCurrentTool() != null)
             {
                 StartCoroutine(ClickCooldown(toolHandler.getCurrentTool()));
 
@@ -78,5 +78,8 @@ public class ClickResourceChecker : MonoBehaviour
         canClick = true;
     }
 
+    public void setInventoryIsOpen(bool value){
+        inventoryIsOpen = value;
+    }
     
 }
