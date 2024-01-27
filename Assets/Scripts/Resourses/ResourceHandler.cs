@@ -13,14 +13,7 @@ public class ResourceHandler : MonoBehaviour
     [SerializeField] private ResourceGenericHandler resourceDrop;
 
     [SerializeField] private int amountDropFrom = 1;
-    [SerializeField] private int amountDropTo = 1;
-
-    [Tooltip("Leave -1 to simply destroy the resource")]
-    [SerializeField] private float secondsToRespawnFrom = -1;
-    
-    [Tooltip("Leave -1 to simply destroy the resource")]
-    [SerializeField] private float secondsToRespawnTo = -1;
-    
+    [SerializeField] private int amountDropTo = 1;   
 
     [SerializeField] private ToolEnum.ToolType toolType;
 
@@ -89,12 +82,12 @@ public class ResourceHandler : MonoBehaviour
                 {
                     // Instantiate the item at the center of the original GameObject
                     GameObject droppedItem = Instantiate(resourceDrop.getDropGameObject(), center, Quaternion.identity);
-                    droppedItem.AddComponent<FloatingResource>();
+                    droppedItem.AddComponent<DroppedResource>();
 
-                    droppedItem.GetComponent<FloatingResource>().setResource(randomAmount, resourceDrop);
+                    droppedItem.GetComponent<DroppedResource>().setResource(randomAmount, resourceDrop);
 
-                    // Access the ResourceInventory component of the player and add the resource
-                    player.GetComponent<ResourceInventory>().AddResource(resourceDrop, randomAmount);
+                    // Change the layer to "ResourceFloating"
+                    droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
 
                     // Enable colliders after instantiation
                     collider.enabled = true;
@@ -108,10 +101,6 @@ public class ResourceHandler : MonoBehaviour
                     // Enable colliders since instantiation failed
                     collider.enabled = true;
                 }
-            }
-            else
-            {
-                Debug.LogWarning("Collider not found on the original GameObject. Ensure a collider is attached.");
             }
         }
     }
@@ -133,19 +122,6 @@ public class ResourceHandler : MonoBehaviour
             return transform.position;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     IEnumerator Effects()
     {

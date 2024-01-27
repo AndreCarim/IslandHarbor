@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.Events;
 using TMPro;
 
 public class HoverOverResource : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
@@ -17,27 +16,27 @@ public class HoverOverResource : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private ResourceGenericHandler resource;
 
     private IEnumerator SetTextDelayed(string toolTipText)
-{
-    textMeshPro.SetText(toolTipText);
-    textMeshPro.ForceMeshUpdate();
+    {
+        textMeshPro.SetText(toolTipText);
+        textMeshPro.ForceMeshUpdate();
 
-    // Wait for the end of the frame
-    yield return null;
+        // Wait for the end of the frame
+        yield return null;
 
-    Vector2 textSize = textMeshPro.GetRenderedValues(false);
-    Vector2 paddingSize = new Vector2(8, 8);
+        Vector2 textSize = textMeshPro.GetRenderedValues(false);
+        Vector2 paddingSize = new Vector2(8, 8);
 
-    backgroundRectTransform.sizeDelta = textSize + paddingSize;
-}
+        backgroundRectTransform.sizeDelta = textSize + paddingSize;
+    }
 
-private void SetText(string toolTipText)
-{
-    StartCoroutine(SetTextDelayed(toolTipText));
-}
+    private void SetText(string toolTipText)
+    {
+        StartCoroutine(SetTextDelayed(toolTipText));
+    }
 
     private void Update()
     {
-        if (toolTip.activeSelf && rectTransform)
+        if (toolTip != null && toolTip.activeSelf && rectTransform != null)
         {
             // Update tooltip position only when active
             rectTransform.anchoredPosition = Input.mousePosition / canvasRectTransform.localScale.x;
@@ -45,11 +44,9 @@ private void SetText(string toolTipText)
     }
 
     public void OnPointerEnter(PointerEventData eventData)
-    {
+    {        
         if (toolTip != null)
         {
-
-            
             // Find the components
             backgroundRectTransform = toolTip.transform.Find("BackGround")?.GetComponent<RectTransform>();
             textMeshPro = toolTip.transform.Find("ResourceName")?.GetComponent<TextMeshProUGUI>();
@@ -70,14 +67,16 @@ private void SetText(string toolTipText)
     }
 
     public void OnPointerExit(PointerEventData eventData)
-    {
+    {        
         if (toolTip != null)
         {
             toolTip.SetActive(false);
         }
     }
 
-    public void setOnCreate(GameObject tip, RectTransform canvas, ResourceGenericHandler resource){
+    // Called by the inventory script attached to the player
+    public void setOnCreate(GameObject tip, RectTransform canvas, ResourceGenericHandler resource)
+    {        
         toolTip = tip;
         canvasRectTransform = canvas;
         this.resource = resource;

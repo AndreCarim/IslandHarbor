@@ -126,7 +126,7 @@ GameObject:
   - component: {fileID: 5738603192363118256}
   - component: {fileID: 7307436346661682046}
   - component: {fileID: 6779463287628481772}
-  - component: {fileID: 9061642529296729650}
+  - component: {fileID: 3798270143610594374}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -222,7 +222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 1000
   playerBody: {fileID: 7840984239331648836}
---- !u!114 &9061642529296729650
+--- !u!114 &3798270143610594374
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -231,13 +231,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 6896477026409487418}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc24f2ab0f1674c9b9a485c377a6636f, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e62b3dbb5f7942929875c5fdef84a3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxDistance: 2
+  maxDistanceHit: 4.5
+  maxDistanceGetDroppedResource: 6.5
   toolHandler: {fileID: 8145150082291897151}
   cooldownSlider: {fileID: 0}
   player: {fileID: 7354540050682905254}
+  tooltipPrefab: {fileID: 311034282945781388, guid: c18b36d93064c455ebe65e0895fe74fa, type: 3}
 --- !u!1 &7354540050682905254
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,6 +359,6 @@ MonoBehaviour:
   inventoryUI: {fileID: 0}
   cameraScript: {fileID: 6779463287628481772}
   movementScript: {fileID: 2954682153621804322}
-  clickScript: {fileID: 9061642529296729650}
+  clickScript: {fileID: 3798270143610594374}
   toolTip: {fileID: 0}
   canvasRectTransform: {fileID: 0}

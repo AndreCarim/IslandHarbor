@@ -21,7 +21,7 @@ public class ResourceInventory : MonoBehaviour
 
     [SerializeField] private FirstPersonCameraHandler cameraScript;
     [SerializeField] private Movement movementScript;
-    [SerializeField] private ClickResourceChecker clickScript;
+    [SerializeField] private RayCastingHandler clickScript;
 
     [SerializeField] private GameObject toolTip;
     [SerializeField] private RectTransform canvasRectTransform;
