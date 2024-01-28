@@ -165,6 +165,18 @@ public class ResourceHandler : MonoBehaviour
         }
     }
 
+    public double getStartHealth(){
+        return startHealth;
+    }
+
+    public double getCurrentHealth(){
+        return currentHealth;
+    }
+
+    public string getName(){
+        return resourceDrop.getResourceName();
+    }
+
     
 
 }
