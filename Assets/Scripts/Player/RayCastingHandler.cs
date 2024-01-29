@@ -199,6 +199,7 @@ public class RayCastingHandler : MonoBehaviour
             collected = true;
             // Access the ResourceInventory component of the player and add the resource
             DroppedResource droppedResourceScript = collectibleResource.GetComponent<DroppedResource>();
+
             player.GetComponent<ResourceInventory>().AddResource(droppedResourceScript.getResource(), droppedResourceScript.getAmount());
 
             Destroy(collectibleResource); // Destroy the collected resource object
@@ -252,7 +253,7 @@ public class RayCastingHandler : MonoBehaviour
     private IEnumerator ShakeSlider(Slider slider)
     {
         Vector3 originalPosition = slider.transform.position;
-        float shakeAmount = 15f; // Increase shake amount
+        float shakeAmount = 12f; // Increase shake amount
         float shakeDuration = 0.3f; // Increase shake duration
         float elapsed = 0f;
 

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class HoverOverResource : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SlotHandlerInventory : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private GameObject toolTip;
     private RectTransform backgroundRectTransform;
@@ -14,6 +14,7 @@ public class HoverOverResource : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private RectTransform canvasRectTransform;
 
     private ResourceGenericHandler resource;
+    private GameObject player;
 
     private IEnumerator SetTextDelayed(string toolTipText)
     {
@@ -75,10 +76,15 @@ public class HoverOverResource : MonoBehaviour, IPointerEnterHandler, IPointerEx
     }
 
     // Called by the inventory script attached to the player
-    public void setOnCreate(GameObject tip, RectTransform canvas, ResourceGenericHandler resource)
+    public void setOnCreate(GameObject tip, RectTransform canvas, ResourceGenericHandler resource, GameObject player)
     {        
         toolTip = tip;
         canvasRectTransform = canvas;
         this.resource = resource;
+        this.player = player;
+    }
+
+    public void onClick(){
+        player.GetComponent<ResourceInventory>().slotSelected(resource, gameObject);
     }
 }
