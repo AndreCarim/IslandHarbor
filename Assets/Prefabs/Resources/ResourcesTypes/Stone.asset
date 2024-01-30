@@ -17,3 +17,4 @@ MonoBehaviour:
   id: 2
   dropGameObject: {fileID: 4872178930830419935, guid: e5518f69ae5c14d3b9cbde37e442f840, type: 3}
   maxAmountInInventory: 999
+  informationText: Timeless and steadfast. Builds empires, echoes history's whispers.

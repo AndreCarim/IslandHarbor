@@ -206,7 +206,7 @@ public class RayCastingHandler : MonoBehaviour
         }
     }
 
-    // Display tooltip for collectible resources
+   // Display tooltip for collectible resources
     void DisplayTooltip(GameObject resourceObject)
     {
         DroppedResource droppedResourceScript = resourceObject.GetComponent<DroppedResource>();
@@ -253,7 +253,7 @@ public class RayCastingHandler : MonoBehaviour
     private IEnumerator ShakeSlider(Slider slider)
     {
         Vector3 originalPosition = slider.transform.position;
-        float shakeAmount = 12f; // Increase shake amount
+        float shakeAmount = 10f; // Increase shake amount
         float shakeDuration = 0.3f; // Increase shake duration
         float elapsed = 0f;
 

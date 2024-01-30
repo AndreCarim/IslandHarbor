@@ -17,7 +17,14 @@ public class ResourceInventory : MonoBehaviour
 
     [SerializeField] private GameObject inventoryUI; // Reference to the inventory UI panel
     [SerializeField] private GameObject dropButton;
-    [SerializeField] private GameObject howManyToDropUI;
+    [SerializeField] private GameObject resourceInforUI;
+
+    //references for the information of the items
+    [SerializeField] private TextMeshProUGUI resourceName;
+    [SerializeField] private TextMeshProUGUI resourceInfo;
+    [SerializeField] private Image resourceIcon;
+    [SerializeField] private Slider amountToDropSlider;
+    [SerializeField] private TextMeshProUGUI amountDropText;
  
     private Dictionary<int, GameObject> resourceUIDictionary = new Dictionary<int, GameObject>();
 
@@ -30,9 +37,14 @@ public class ResourceInventory : MonoBehaviour
 
     private ResourceGenericHandler resourceSelected;
     private GameObject slot;
+    private Camera mainCamera;
 
     // Store the Coroutine reference for the shaking animation
     private Coroutine shakeCoroutine;
+
+    void Start(){
+        mainCamera = Camera.main;
+    }
 
     void Update()
     {
@@ -50,7 +62,8 @@ public class ResourceInventory : MonoBehaviour
                 cameraScript.setIsFreeToLook(false); //lock the mouse
                 movementScript.setCanWalk(false); // lock walking
                 clickScript.setInventoryIsOpen(true); // lock clicking
-                dropButton.SetActive(false);
+                resourceInforUI.SetActive(false);
+                slot = null;
             }
             else
             {
@@ -118,6 +131,7 @@ public class ResourceInventory : MonoBehaviour
         }
         else
         {
+            
             // Create new UI
             GameObject newResourceUI = Instantiate(resourceUIPrefab, resourceUIParent);
             newResourceUI.name = resource.getId().ToString(); // Set the name to the resource ID
@@ -165,45 +179,25 @@ public class ResourceInventory : MonoBehaviour
         }
     }
 
-//this is being called by slotHandlerInventory script everytime the player selects a slot
+
+    
+
+
     public void slotSelected(ResourceGenericHandler resourceSelected, GameObject slot){
-        this.resourceSelected = resourceSelected;
-        this.slot = slot;
-
-        // Start shaking the slot
-        if (slot != null)
+    // Check if the selected slot is different from the current one
+        if (this.slot != slot)
         {
-            StartShaking();
-        }
+            this.resourceSelected = resourceSelected;
+            this.slot = slot;
 
-        dropButton.SetActive(true);
-    }
-
-    //this is being called by the button component on the dropButton isnde the inventory UI
-    public void dropButtonPressed()
-    {
-        // Check if the resource is in the inventory
-        if (resourceUIDictionary.ContainsKey(resourceSelected.getId()))
-        {
-            // Get the amount of the selected resource
-            int amount = resourceCountDictionary.ContainsKey(resourceSelected.getId()) ? resourceCountDictionary[resourceSelected.getId()] : 0;
-
-            // Check if the player has more than one of this resource
-            if (amount > 1)
+            // Start shaking the slot
+            if (slot != null)
             {
-                // If the player has more than one, we want to ask how many we want to drop
-                Debug.Log("Player has more than one of this resource. Implement dropping logic.");
+                StartShaking();
+                setItemInformation(resourceSelected);
             }
-            else
-            {
-                // If the player has only one, drop imidiatly
-                Debug.Log("Player has only one of this resource. Implement handling logic.");
-            }
-        }
-        else
-        {
-            // If the resource is not in the inventory, do nothing. THIS SHOULD NOT HAPPEN!
-            Debug.Log("How are you clicking on a item that you dont have? \n and why are you seeing this message???");
+
+            resourceInforUI.SetActive(true);
         }
     }
 
@@ -235,7 +229,7 @@ public class ResourceInventory : MonoBehaviour
         // Shake animation loops
         while (inventoryUI.activeSelf)
         {
-            // Calculate a random offset for the shake
+           // Calculate a random offset for the shake
             Vector3 randomOffset = new Vector3(Random.Range(-intensity, intensity), Random.Range(-intensity, intensity), 0f);
 
             // Apply the offset to the slot's position
@@ -247,5 +241,108 @@ public class ResourceInventory : MonoBehaviour
 
         // Reset the slot's position to its original position
         rectTransform.anchoredPosition = originalPosition;
+    }
+
+    //this is being called by the button component on the dropButton isnde the inventory UI
+    public void dropButtonPressed()
+    {
+        // Check if the resource is in the inventory
+        if (resourceUIDictionary.ContainsKey(resourceSelected.getId()))
+        {
+            // Get the amount of the selected resource
+            int amountPlayerHas = resourceCountDictionary.ContainsKey(resourceSelected.getId()) ? resourceCountDictionary[resourceSelected.getId()] : 0;
+
+            // Check if the player has enough resource
+            int amountToDrop = (int)amountToDropSlider.value;
+            if (amountPlayerHas >= amountToDrop)
+            {
+                // Stop the previous shaking coroutine if it's running
+                if (shakeCoroutine != null)
+                {
+                    StopCoroutine(shakeCoroutine);
+                }
+
+                // If the player has only one, drop imidiatly
+                RemoveResource(resourceSelected, amountToDrop);
+
+                // Calculate the center of the GameObject
+                Vector3 positionToDrop = calculatePositionToDrop();
+
+               // Instantiate the item at the center of the original GameObject
+                GameObject droppedItem = Instantiate(resourceSelected.getDropGameObject(), positionToDrop, Quaternion.identity);
+                droppedItem.AddComponent<DroppedResource>();
+
+                droppedItem.GetComponent<DroppedResource>().setResource(amountToDrop, resourceSelected);
+
+                // Change the layer to "ResourceFloating"
+                droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
+
+                setItemInformation(resourceSelected);
+            }
+        }
+        else
+        {
+            // If the resource is not in the inventory, do nothing. THIS SHOULD NOT HAPPEN!
+            Debug.Log("How are you clicking on a item that you dont have? \n and why are you seeing this message???");
+        }
+    }
+
+    private Vector3 calculatePositionToDrop()
+    {
+        // Ensure we have a main camera
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera not found!");
+            return Vector3.zero;
+        }
+
+        // Calculate the position in front of the camera
+        float distanceFromCamera = 1.5f; // Adjust this value to control the distance from the camera
+        Vector3 positionInFrontOfCamera = mainCamera.transform.position + mainCamera.transform.forward * distanceFromCamera;
+
+        return positionInFrontOfCamera;
+    }
+
+    private void setItemInformation(ResourceGenericHandler resourceSelected){
+        if(resourceCountDictionary.ContainsKey(resourceSelected.getId())){ //checks if the player has the item
+            resourceInfo.text = resourceSelected.getInformationText();
+            resourceName.text = resourceSelected.getResourceName();
+            resourceIcon.sprite = resourceSelected.getIcon();
+
+            amountToDropSlider.maxValue = resourceCountDictionary[resourceSelected.getId()];
+
+            if(resourceCountDictionary[resourceSelected.getId()] > 1){
+                amountToDropSlider.minValue = 1f;
+                amountToDropSlider.value = 1f;
+            }else{
+                amountToDropSlider.minValue = 0f;
+                amountToDropSlider.value = 1f;
+            }
+
+            setTextAmountDrop();
+        }else{
+            resourceInforUI.SetActive(false);
+        }
+        
+    }
+
+    public void setTextAmountDrop(){
+        amountDropText.text = amountToDropSlider.value.ToString();
+
+        if(amountToDropSlider.value > 0){
+            dropButton.SetActive(true);
+        }else{
+            dropButton.SetActive(false);
+        }
+    }
+
+    public void setMaxDrop(){
+        amountToDropSlider.value = amountToDropSlider.maxValue;
+        setTextAmountDrop();
+    }
+
+    public void setMinDrop(){
+        amountToDropSlider.value = amountToDropSlider.minValue;
+        setTextAmountDrop();
     }
 }

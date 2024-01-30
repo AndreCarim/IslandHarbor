@@ -220,8 +220,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f5157da10dff474681d8d13fddeec80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 1000
+  mouseSensitivity: 500
   playerBody: {fileID: 7840984239331648836}
+  smoothTime: 0.5
 --- !u!114 &3798270143610594374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,6 +240,13 @@ MonoBehaviour:
   toolHandler: {fileID: 8145150082291897151}
   cooldownSlider: {fileID: 0}
   player: {fileID: 7354540050682905254}
+  isBreakableCenterColor: {r: 0.9433962, g: 0.6007476, b: 0.6007476, a: 1}
+  CollectibleResourceCenterColor: {r: 0.6247775, g: 0.9811321, b: 0.67482233, a: 1}
+  centerDot: {fileID: 0}
+  hPTopScreen: {fileID: 0}
+  hpTopScreenText: {fileID: 0}
+  hpTopScreenSlider: {fileID: 0}
+  hpTextAnimation: {fileID: 0}
   tooltipPrefab: {fileID: 311034282945781388, guid: c18b36d93064c455ebe65e0895fe74fa, type: 3}
 --- !u!1 &7354540050682905254
 GameObject:
@@ -291,7 +299,7 @@ CharacterController:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -357,6 +365,13 @@ MonoBehaviour:
   resourceUIPrefab: {fileID: 3226846953012215088, guid: 26c7e033e54244616b3e78cbd0207ca3, type: 3}
   resourceUIParent: {fileID: 0}
   inventoryUI: {fileID: 0}
+  dropButton: {fileID: 0}
+  resourceInforUI: {fileID: 0}
+  resourceName: {fileID: 0}
+  resourceInfo: {fileID: 0}
+  resourceIcon: {fileID: 0}
+  amountToDropSlider: {fileID: 0}
+  amountDropText: {fileID: 0}
   cameraScript: {fileID: 6779463287628481772}
   movementScript: {fileID: 2954682153621804322}
   clickScript: {fileID: 3798270143610594374}

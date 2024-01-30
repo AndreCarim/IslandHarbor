@@ -33,4 +33,8 @@ public class ResourceGenericHandler : ScriptableObject
     public GameObject getDropGameObject(){
         return dropGameObject;
     }
+
+    public string getInformationText(){
+        return informationText;
+    }
 } 

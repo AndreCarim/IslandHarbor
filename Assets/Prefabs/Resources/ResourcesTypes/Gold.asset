@@ -17,3 +17,4 @@ MonoBehaviour:
   id: 3
   dropGameObject: {fileID: 1819027836624584374, guid: 686506779476a44f2b8268d2952994c5, type: 3}
   maxAmountInInventory: 999
+  informationText: Precious metal, coveted treasure. Sparks dreams, unlocks opportunity.
