@@ -200,9 +200,7 @@ public class RayCastingHandler : MonoBehaviour
             // Access the ResourceInventory component of the player and add the resource
             DroppedResource droppedResourceScript = collectibleResource.GetComponent<DroppedResource>();
 
-            player.GetComponent<ResourceInventory>().AddResource(droppedResourceScript.getResource(), droppedResourceScript.getAmount());
-
-            Destroy(collectibleResource); // Destroy the collected resource object
+            player.GetComponent<ResourceInventory>().AddResource(droppedResourceScript.getResource(), droppedResourceScript.getAmount(), collectibleResource);
         }
     }
 

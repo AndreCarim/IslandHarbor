@@ -11,7 +11,7 @@ public class ResourceGenericHandler : ScriptableObject
     [SerializeField] private int id;
     [SerializeField] private GameObject dropGameObject;
 
-    [SerializeField] private int maxAmountInInventory;
+    [SerializeField] private int weight;
     [SerializeField] private string informationText;
 
     public int getId(){
@@ -26,15 +26,15 @@ public class ResourceGenericHandler : ScriptableObject
         return icon;
     }
 
-    public int getMaxAmountInInventory(){
-        return maxAmountInInventory;
-    }
-
     public GameObject getDropGameObject(){
         return dropGameObject;
     }
 
     public string getInformationText(){
         return informationText;
+    }
+
+    public int getWeight(){
+        return weight;
     }
 } 

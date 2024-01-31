@@ -25,6 +25,7 @@ public class ResourceInventory : MonoBehaviour
     [SerializeField] private Image resourceIcon;
     [SerializeField] private Slider amountToDropSlider;
     [SerializeField] private TextMeshProUGUI amountDropText;
+    [SerializeField] private TextMeshProUGUI amountWeightDropText;
  
     private Dictionary<int, GameObject> resourceUIDictionary = new Dictionary<int, GameObject>();
 
@@ -34,6 +35,12 @@ public class ResourceInventory : MonoBehaviour
 
     [SerializeField] private GameObject toolTip;
     [SerializeField] private RectTransform canvasRectTransform;
+
+    [SerializeField] private int currentMaxCarryWeight = 500;
+    [SerializeField] private int currentCarryWeight;
+    [SerializeField] private Slider weightSlider;
+    [SerializeField] private TextMeshProUGUI currentMaxCarryWeightText;
+    [SerializeField] private TextMeshProUGUI currentCarryWeightText;
 
     private ResourceGenericHandler resourceSelected;
     private GameObject slot;
@@ -54,7 +61,7 @@ public class ResourceInventory : MonoBehaviour
             // Toggle the visibility of the inventory UI panel
             bool isOpen = !inventoryUI.activeSelf;
             inventoryUI.SetActive(isOpen);
-
+            setweightText();
 
              // Call different functions based on the inventory state
             if (isOpen)
@@ -76,22 +83,69 @@ public class ResourceInventory : MonoBehaviour
     }
 
     // Method to add a resource to the inventory
-    public void AddResource(ResourceGenericHandler resource, int amount)
+    public void AddResource(ResourceGenericHandler resource, int amount, GameObject collectibleResource)
     {
         // Check if the resource ID already exists in the dictionary
         if (resourceCountDictionary.ContainsKey(resource.getId()))
         {
             // If it exists, increment its count
-            resourceCountDictionary[resource.getId()] += amount;
-        }
-        else
+            int weightToAdd = resource.getWeight() * amount;
+
+            // Check if the player has enough space to carry all the items
+            int remainingWeightCapacity = currentMaxCarryWeight - currentCarryWeight;
+            if (weightToAdd <= remainingWeightCapacity)
+            {
+                // The player has space to carry all the items
+                resourceCountDictionary[resource.getId()] += amount;
+                currentCarryWeight += weightToAdd;
+            }
+            else
+            {
+                // The player doesn't have enough space for all items
+                // Calculate the maximum number of items the player can pick up without exceeding the weight limit
+                int maxAmount = remainingWeightCapacity / resource.getWeight();
+                
+                // Add only the maximum possible amount
+                resourceCountDictionary[resource.getId()] += maxAmount;
+                currentCarryWeight += maxAmount * resource.getWeight();
+
+                //drop the remaining
+                dropItemInFrontOfThePlayer(amount - maxAmount, resource);
+            }
+            
+        }else
         {
-            // If it doesn't exist, add it to the dictionary with its count
-            resourceCountDictionary.Add(resource.getId(), amount);
+            // If it exists, increment its count
+            int weightToAdd = resource.getWeight() * amount;
+
+            // Check if the player has enough space to carry all the items
+            int remainingWeightCapacity = currentMaxCarryWeight - currentCarryWeight;
+            if (weightToAdd <= remainingWeightCapacity)
+            {
+                // The player has space to carry all the items
+                resourceCountDictionary.Add(resource.getId(), amount);
+                currentCarryWeight += weightToAdd;
+            }
+            else
+            {
+                // The player doesn't have enough space for all items
+                // Calculate the maximum number of items the player can pick up without exceeding the weight limit
+                int maxAmount = remainingWeightCapacity / resource.getWeight();
+                
+                // Add only the maximum possible amount
+                resourceCountDictionary.Add(resource.getId(), maxAmount);
+                currentCarryWeight += maxAmount * resource.getWeight();
+
+                //drop the remaining
+               dropItemInFrontOfThePlayer(amount - maxAmount, resource);
+            }
+
+            
         }
 
         // Create UI for the new resource
         CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
+        Destroy(collectibleResource);
     }
 
     // Method to remove a resource from the inventory
@@ -153,6 +207,7 @@ public class ResourceInventory : MonoBehaviour
             }
 
             UpdateResourceUI(newResourceUI, amount);
+            setweightText();
         }
     }
 
@@ -262,22 +317,10 @@ public class ResourceInventory : MonoBehaviour
                     StopCoroutine(shakeCoroutine);
                 }
 
-                // If the player has only one, drop imidiatly
-                RemoveResource(resourceSelected, amountToDrop);
+                currentCarryWeight -= resourceSelected.getWeight() * amountToDrop;
 
-                // Calculate the center of the GameObject
-                Vector3 positionToDrop = calculatePositionToDrop();
-
-               // Instantiate the item at the center of the original GameObject
-                GameObject droppedItem = Instantiate(resourceSelected.getDropGameObject(), positionToDrop, Quaternion.identity);
-                droppedItem.AddComponent<DroppedResource>();
-
-                droppedItem.GetComponent<DroppedResource>().setResource(amountToDrop, resourceSelected);
-
-                // Change the layer to "ResourceFloating"
-                droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
-
-                setItemInformation(resourceSelected);
+                RemoveResource(resourceSelected, amountToDrop); //from the inventory ui
+                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected);              
             }
         }
         else
@@ -285,6 +328,24 @@ public class ResourceInventory : MonoBehaviour
             // If the resource is not in the inventory, do nothing. THIS SHOULD NOT HAPPEN!
             Debug.Log("How are you clicking on a item that you dont have? \n and why are you seeing this message???");
         }
+    }
+
+    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop){        
+
+        // Calculate the center of the GameObject
+        Vector3 positionToDrop = calculatePositionToDrop();
+
+        // Instantiate the item at the center of the original GameObject
+        GameObject droppedItem = Instantiate(resourceToDrop.getDropGameObject(), positionToDrop, Quaternion.identity);
+        droppedItem.AddComponent<DroppedResource>();
+
+        droppedItem.GetComponent<DroppedResource>().setResource(amountToDrop, resourceToDrop);
+
+        // Change the layer to "ResourceFloating"
+        droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
+
+        setItemInformation(resourceToDrop);
+        
     }
 
     private Vector3 calculatePositionToDrop()
@@ -318,22 +379,36 @@ public class ResourceInventory : MonoBehaviour
                 amountToDropSlider.minValue = 0f;
                 amountToDropSlider.value = 1f;
             }
-
-            setTextAmountDrop();
+    
+            
         }else{
             resourceInforUI.SetActive(false);
-        }
-        
+        }   
+
+        setTextAmountDrop();
     }
 
     public void setTextAmountDrop(){
         amountDropText.text = amountToDropSlider.value.ToString();
+        setweightText();
+
+        if(resourceSelected){
+            amountWeightDropText.text = (resourceSelected.getWeight() * amountToDropSlider.value).ToString();
+        }
 
         if(amountToDropSlider.value > 0){
             dropButton.SetActive(true);
         }else{
             dropButton.SetActive(false);
         }
+    }
+
+    private void setweightText(){
+        weightSlider.maxValue = (float)currentMaxCarryWeight;
+        weightSlider.value = (float)currentCarryWeight;   
+
+        currentCarryWeightText.text = currentCarryWeight.ToString();
+        currentMaxCarryWeightText.text = currentMaxCarryWeight.ToString();
     }
 
     public void setMaxDrop(){
