@@ -242,7 +242,12 @@ public class RayCastingHandler : MonoBehaviour
         TextMeshPro textMeshPro = toolTip.GetComponent<TextMeshPro>();
         if (textMeshPro)
         {
-            textMeshPro.text = resource.getResource().getResourceName() + "\n Qty: " + resource.getAmount() + "\n Press E to collect";
+            string resourceName = "<color=red>" + resource.getResource().getResourceName() + "</color>";
+            string amountText = "<color=green>Qty: " + resource.getAmount() + "</color>";
+            string weightText = "<color=white>" + resource.getResource().getWeight().ToString() + "/" + (resource.getResource().getWeight() * resource.getAmount()).ToString()+ "</color>";
+            string instructionText = "<color=blue>Press E to collect</color>";
+            
+            textMeshPro.text = resourceName + "\n" + amountText + "\n" + weightText + "\n" + instructionText;
         }
     }
 
