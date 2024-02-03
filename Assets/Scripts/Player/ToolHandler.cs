@@ -3,38 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using Unity.Netcode;
 
 //this script is responsible for picking up which tool you have
 //it also sets which kind of tools there are.
-public class ToolHandler : MonoBehaviour
+public class ToolHandler : NetworkBehaviour
 {
     private ToolGenericHandler currentTool;
-
-    [SerializeField] private Image pickAxeIsOn;
-    [SerializeField] private Image axeIsOn;
-    [SerializeField] private Image weaponIsOn;
+    private ToolUIHandler toolUIHandler; // calls functions from the tooluihandler inside the ui
 
     [SerializeField] private ToolGenericHandler currentAxe;
     [SerializeField] private ToolGenericHandler currentPickAxe;
     [SerializeField] private ToolGenericHandler currentWeapon;
 
 
-
-    void Start(){
+    public override void OnNetworkSpawn(){
         currentTool = currentAxe;
-        setIsOn(axeIsOn);
+        
     }
 
     //this will handle the changing of tool pressing 1,2 and 3
     void Update()
     {
+
+        if(!IsOwner) return;
+
         // Check if the player pressed the 1 key
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             if(currentTool != currentAxe){
                 currentTool = currentAxe;
-                setIsOn(axeIsOn);
+                toolUIHandler.setIsOn(0);
             }
         }
 
@@ -43,7 +42,7 @@ public class ToolHandler : MonoBehaviour
         {
             if(currentTool != currentPickAxe){
                 currentTool = currentPickAxe;
-                setIsOn(pickAxeIsOn);
+                toolUIHandler.setIsOn(1);
             }
             // Call a function or perform an action related to key 2
         }
@@ -53,7 +52,7 @@ public class ToolHandler : MonoBehaviour
         {
             if(currentTool != currentWeapon){
                 currentTool = currentWeapon;
-                setIsOn(weaponIsOn);
+                toolUIHandler.setIsOn(2);
             }
             // Call a function or perform an action related to key 3
         }
@@ -61,15 +60,6 @@ public class ToolHandler : MonoBehaviour
 
     public ToolGenericHandler getCurrentTool(){
         return currentTool;
-    }
-
-    private void setIsOn(Image isOnUI)
-    {
-        pickAxeIsOn.color = new Color(pickAxeIsOn.color.r, pickAxeIsOn.color.g, pickAxeIsOn.color.b, 0f);
-        axeIsOn.color = new Color(axeIsOn.color.r, axeIsOn.color.g, axeIsOn.color.b, 0f);
-        weaponIsOn.color = new Color(weaponIsOn.color.r, weaponIsOn.color.g, weaponIsOn.color.b, 0f);
-
-        isOnUI.color = new Color(isOnUI.color.r, isOnUI.color.g, isOnUI.color.b, 1f);
     }
 
     public ToolGenericHandler getCurrentAxe(){
@@ -82,5 +72,10 @@ public class ToolHandler : MonoBehaviour
     
     public ToolGenericHandler getCurrentWeapon(){
         return currentAxe;
+    }
+
+    public void setOnStart( GameObject entirePlayerUIInstance){
+        toolUIHandler = entirePlayerUIInstance.GetComponent<ToolUIHandler>();
+        toolUIHandler.setIsOn(0);
     }
 }

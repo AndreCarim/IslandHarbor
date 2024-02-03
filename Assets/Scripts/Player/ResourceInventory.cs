@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Unity.Netcode;
 
-public class ResourceInventory : MonoBehaviour
+public class ResourceInventory : NetworkBehaviour
 {
     // This dictionary will store the item ID as the key and the quantity as the value.
     [SerializeField] private Dictionary<int, int> resourceCountDictionary = new Dictionary<int, int>();
@@ -12,42 +13,21 @@ public class ResourceInventory : MonoBehaviour
     //  This dictionary will store the item ID as the key and the corresponding UI GameObject as the value.
     public Dictionary<int, int> ResourceCountDictionary => resourceCountDictionary;
 
-    [SerializeField] private GameObject resourceUIPrefab;
-    [SerializeField] private Transform resourceUIParent;
-
-    [SerializeField] private GameObject inventoryUI; // Reference to the inventory UI panel
-    [SerializeField] private GameObject dropButton;
-    [SerializeField] private GameObject resourceInforUI;
-
-    //references for the information of the items
-    [SerializeField] private TextMeshProUGUI resourceName;
-    [SerializeField] private TextMeshProUGUI resourceInfo;
-    [SerializeField] private Image resourceIcon;
-    [SerializeField] private Slider amountToDropSlider;
-    [SerializeField] private TextMeshProUGUI amountDropText;
-    [SerializeField] private TextMeshProUGUI amountWeightDropText;
- 
-    private Dictionary<int, GameObject> resourceUIDictionary = new Dictionary<int, GameObject>();
+    private InventoryUIHandler inventoryUIHandlerScript;
 
     [SerializeField] private FirstPersonCameraHandler cameraScript;
     [SerializeField] private Movement movementScript;
     [SerializeField] private RayCastingHandler clickScript;
 
-    [SerializeField] private GameObject toolTip;
-    [SerializeField] private RectTransform canvasRectTransform;
-
     [SerializeField] private int currentMaxCarryWeight = 500;
-    [SerializeField] private int currentCarryWeight;
-    [SerializeField] private Slider weightSlider;
-    [SerializeField] private TextMeshProUGUI currentMaxCarryWeightText;
-    [SerializeField] private TextMeshProUGUI currentCarryWeightText;
-
+    [SerializeField] private int currentCarryWeight = 0;
+ 
     private ResourceGenericHandler resourceSelected;
     private GameObject slot;
     private Camera mainCamera;
 
-    // Store the Coroutine reference for the shaking animation
     private Coroutine shakeCoroutine;
+   
 
     void Start(){
         mainCamera = Camera.main;
@@ -55,13 +35,17 @@ public class ResourceInventory : MonoBehaviour
 
     void Update()
     {
+
+          // Check if the client is the owner of the object
+        if (!IsOwner)
+            return; // Exit the method if not the owner
+
         // Check if the player presses the Tab or I key
         if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.I))
         {
             // Toggle the visibility of the inventory UI panel
-            bool isOpen = !inventoryUI.activeSelf;
-            inventoryUI.SetActive(isOpen);
-            setweightText();
+            bool isOpen = inventoryUIHandlerScript.checkActiveInventory();
+            inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
 
              // Call different functions based on the inventory state
             if (isOpen)
@@ -69,7 +53,7 @@ public class ResourceInventory : MonoBehaviour
                 cameraScript.setIsFreeToLook(false); //lock the mouse
                 movementScript.setCanWalk(false); // lock walking
                 clickScript.setInventoryIsOpen(true); // lock clicking
-                resourceInforUI.SetActive(false);
+                inventoryUIHandlerScript.setUIInfo(false);
                 slot = null;
             }
             else
@@ -77,7 +61,7 @@ public class ResourceInventory : MonoBehaviour
                 cameraScript.setIsFreeToLook(true); // unlock the mouse
                 movementScript.setCanWalk(true); // unlock the walk
                 clickScript.setInventoryIsOpen(false); // unlock clicking
-                toolTip.SetActive(false);
+                inventoryUIHandlerScript.setToolTip(false);
             }
         }
     }
@@ -85,6 +69,10 @@ public class ResourceInventory : MonoBehaviour
     // Method to add a resource to the inventory
     public void AddResource(ResourceGenericHandler resource, int amount, GameObject collectibleResource)
     {
+          // Check if the client is the owner of the object
+        if (!IsOwner)
+            return; // Exit the method if not the owner
+
         // Check if the resource ID already exists in the dictionary
         if (resourceCountDictionary.ContainsKey(resource.getId()))
         {
@@ -99,23 +87,22 @@ public class ResourceInventory : MonoBehaviour
                 resourceCountDictionary[resource.getId()] += amount;
                 currentCarryWeight += weightToAdd;
             }
-            else
+            else//resourceInforUI
             {
                 // The player doesn't have enough space for all items
                 // Calculate the maximum number of items the player can pick up without exceeding the weight limit
                 int maxAmount = remainingWeightCapacity / resource.getWeight();
-                
                 // Add only the maximum possible amount
                 resourceCountDictionary[resource.getId()] += maxAmount;
                 currentCarryWeight += maxAmount * resource.getWeight();
 
                 //drop the remaining
-                dropItemInFrontOfThePlayer(amount - maxAmount, resource);
+                dropItemInFrontOfThePlayer(amount - maxAmount, resource, true);
             }
             
         }else
         {
-            // If it exists, increment its count
+            // If it does not exist, add its count
             int weightToAdd = resource.getWeight() * amount;
 
             // Check if the player has enough space to carry all the items
@@ -128,29 +115,32 @@ public class ResourceInventory : MonoBehaviour
             }
             else
             {
+
                 // The player doesn't have enough space for all items
                 // Calculate the maximum number of items the player can pick up without exceeding the weight limit
                 int maxAmount = remainingWeightCapacity / resource.getWeight();
-                
+
                 // Add only the maximum possible amount
                 resourceCountDictionary.Add(resource.getId(), maxAmount);
+
                 currentCarryWeight += maxAmount * resource.getWeight();
-
                 //drop the remaining
-               dropItemInFrontOfThePlayer(amount - maxAmount, resource);
+               dropItemInFrontOfThePlayer(amount - maxAmount, resource, true);
             }
-
-            
         }
 
         // Create UI for the new resource
-        CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
+        inventoryUIHandlerScript.CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
         Destroy(collectibleResource);
     }
 
     // Method to remove a resource from the inventory
     public void RemoveResource(ResourceGenericHandler resource, int amount)
     {
+          // Check if the client is the owner of the object
+        if (!IsOwner)
+            return; // Exit the method if not the owner
+
         // Check if the resource ID exists in the dictionary
         if (resourceCountDictionary.ContainsKey(resource.getId()))
         {
@@ -163,80 +153,19 @@ public class ResourceInventory : MonoBehaviour
                 resourceCountDictionary.Remove(resource.getId());
 
                 // Remove UI for the resource
-                RemoveResourceUI(resource.getId());
+                inventoryUIHandlerScript.RemoveResourceUI(resource.getId());
+
+                inventoryUIHandlerScript.setUIInfo(false);
             }
             else
             {
                 // Update UI for the resource
-                CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
+                inventoryUIHandlerScript.CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
+
+                inventoryUIHandlerScript.StartShaking();
             }
         }
     }
-
-    //UI
-
-    private void CreateOrUpdateResourceUI(ResourceGenericHandler resource, int amount)
-    {
-        if (resourceUIDictionary.ContainsKey(resource.getId()))
-        {
-            // Update existing UI
-            GameObject resourceUI = resourceUIDictionary[resource.getId()];
-            UpdateResourceUI(resourceUI,  amount);
-        }
-        else
-        {
-            
-            // Create new UI
-            GameObject newResourceUI = Instantiate(resourceUIPrefab, resourceUIParent);
-            newResourceUI.name = resource.getId().ToString(); // Set the name to the resource ID
-            resourceUIDictionary.Add(resource.getId(), newResourceUI);
-
-            // Update UI elements (image, text) based on resource data
-            GameObject iconObject = newResourceUI.transform.Find("Icon").gameObject; // Assuming "icon" is the name of the child object
-            Image iconImage = iconObject.GetComponent<Image>();
-            newResourceUI.GetComponent<SlotHandlerInventory>().setOnCreate(toolTip, canvasRectTransform, resource, gameObject);
-
-            // Debug: Check if the sprite is not null
-            if (resource.getIcon() != null)
-            {
-                iconImage.sprite = resource.getIcon();
-            }
-            else
-            {
-                Debug.LogWarning($"Sprite for resource {resource.getId()} is null");
-            }
-
-            UpdateResourceUI(newResourceUI, amount);
-            setweightText();
-        }
-    }
-
-    // Method to update UI for a resource
-    private void UpdateResourceUI(GameObject resourceUI, int amount)
-    {
-        TextMeshProUGUI amountText = resourceUI.GetComponentInChildren<TextMeshProUGUI>();
-
-        // Set the amount text
-        amountText.text = amount.ToString();
-
-        // Disable the UI if the amount is 0
-        resourceUI.SetActive(amount > 0);
-    }
-
-    // Method to remove UI for a resource
-    private void RemoveResourceUI(int resourceId)
-    {
-        if (resourceUIDictionary.ContainsKey(resourceId))
-        {
-            GameObject resourceUI = resourceUIDictionary[resourceId];
-            resourceUIDictionary.Remove(resourceId);
-            Destroy(resourceUI);
-        }
-    }
-
-
-    
-
 
     public void slotSelected(ResourceGenericHandler resourceSelected, GameObject slot){
     // Check if the selected slot is different from the current one
@@ -245,82 +174,36 @@ public class ResourceInventory : MonoBehaviour
             this.resourceSelected = resourceSelected;
             this.slot = slot;
 
-            // Start shaking the slot
-            if (slot != null)
-            {
-                StartShaking();
-                setItemInformation(resourceSelected);
-            }
-
-            resourceInforUI.SetActive(true);
+            inventoryUIHandlerScript.setResourceSelected(resourceSelected, slot, resourceCountDictionary[resourceSelected.getId()]);
         }
-    }
-
-
-    // Function to start the shake animation for the slot
-    public void StartShaking()
-    {
-        // Stop the previous shaking coroutine if it's running
-        if (shakeCoroutine != null)
-        {
-            StopCoroutine(shakeCoroutine);
-        }
-
-        // Start a new coroutine for the current button
-        shakeCoroutine = StartCoroutine(ShakeCoroutine());
-    }
-
-    // Coroutine for the shake animation
-    private IEnumerator ShakeCoroutine()
-    {
-        RectTransform rectTransform = slot.GetComponent<RectTransform>();
-
-        // Intensity of the shake
-        float intensity = 5f;
-
-        // Initial position of the slot
-        Vector3 originalPosition = rectTransform.anchoredPosition;
-
-        // Shake animation loops
-        while (inventoryUI.activeSelf)
-        {
-           // Calculate a random offset for the shake
-            Vector3 randomOffset = new Vector3(Random.Range(-intensity, intensity), Random.Range(-intensity, intensity), 0f);
-
-            // Apply the offset to the slot's position
-            rectTransform.anchoredPosition = originalPosition + randomOffset;
-
-            // Wait for the end of the frame
-            yield return null;
-        }
-
-        // Reset the slot's position to its original position
-        rectTransform.anchoredPosition = originalPosition;
     }
 
     //this is being called by the button component on the dropButton isnde the inventory UI
     public void dropButtonPressed()
     {
+          // Check if the client is the owner of the object
+        if (!IsOwner)
+            return; // Exit the method if not the owner
+
         // Check if the resource is in the inventory
-        if (resourceUIDictionary.ContainsKey(resourceSelected.getId()))
+        if (resourceCountDictionary.ContainsKey(resourceSelected.getId()))
         {
+            
             // Get the amount of the selected resource
             int amountPlayerHas = resourceCountDictionary.ContainsKey(resourceSelected.getId()) ? resourceCountDictionary[resourceSelected.getId()] : 0;
-
             // Check if the player has enough resource
-            int amountToDrop = (int)amountToDropSlider.value;
+            int amountToDrop = inventoryUIHandlerScript.getAmountToDropSlider();
             if (amountPlayerHas >= amountToDrop)
-            {
-                // Stop the previous shaking coroutine if it's running
-                if (shakeCoroutine != null)
-                {
-                    StopCoroutine(shakeCoroutine);
-                }
+            {//inventoryUIHandler
+
+                inventoryUIHandlerScript.stopCoroutine();
 
                 currentCarryWeight -= resourceSelected.getWeight() * amountToDrop;
 
-                RemoveResource(resourceSelected, amountToDrop); //from the inventory ui
-                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected);              
+                RemoveResource(resourceSelected, amountToDrop); //from the inventory ui  
+                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false);   
+                
+                inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
             }
         }
         else
@@ -330,8 +213,11 @@ public class ResourceInventory : MonoBehaviour
         }
     }
 
-    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop){        
-
+    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop, bool isExtra){   
+          // Check if the client is the owner of the object
+        if (!IsOwner)
+            return; // Exit the method if not the owner
+        
         // Calculate the center of the GameObject
         Vector3 positionToDrop = calculatePositionToDrop();
 
@@ -344,8 +230,11 @@ public class ResourceInventory : MonoBehaviour
         // Change the layer to "ResourceFloating"
         droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
 
-        setItemInformation(resourceToDrop);
-        
+        if(!isExtra){//meaning that it is dropping from the inventory, if its true, its dropping
+            if(resourceCountDictionary.ContainsKey(resourceSelected.getId())){
+                inventoryUIHandlerScript.setItemInformation(resourceToDrop, resourceCountDictionary.ContainsKey(resourceSelected.getId()), resourceCountDictionary[resourceSelected.getId()]);
+            }  
+        }
     }
 
     private Vector3 calculatePositionToDrop()
@@ -364,60 +253,14 @@ public class ResourceInventory : MonoBehaviour
         return positionInFrontOfCamera;
     }
 
-    private void setItemInformation(ResourceGenericHandler resourceSelected){
-        if(resourceCountDictionary.ContainsKey(resourceSelected.getId())){ //checks if the player has the item
-            resourceInfo.text = resourceSelected.getInformationText();
-            resourceName.text = resourceSelected.getResourceName();
-            resourceIcon.sprite = resourceSelected.getIcon();
+    public void setOnStart(GameObject entirePlayerUIInstance){
+          // Check if the client is the owner of the object
+        if (!IsOwner)
+            return; // Exit the method if not the owner
+        
+        inventoryUIHandlerScript = entirePlayerUIInstance.GetComponent<InventoryUIHandler>();
 
-            amountToDropSlider.maxValue = resourceCountDictionary[resourceSelected.getId()];
-
-            if(resourceCountDictionary[resourceSelected.getId()] > 1){
-                amountToDropSlider.minValue = 1f;
-                amountToDropSlider.value = 1f;
-            }else{
-                amountToDropSlider.minValue = 0f;
-                amountToDropSlider.value = 1f;
-            }
-    
-            
-        }else{
-            resourceInforUI.SetActive(false);
-        }   
-
-        setTextAmountDrop();
-    }
-
-    public void setTextAmountDrop(){
-        amountDropText.text = amountToDropSlider.value.ToString();
-        setweightText();
-
-        if(resourceSelected){
-            amountWeightDropText.text = (resourceSelected.getWeight() * amountToDropSlider.value).ToString();
-        }
-
-        if(amountToDropSlider.value > 0){
-            dropButton.SetActive(true);
-        }else{
-            dropButton.SetActive(false);
-        }
-    }
-
-    private void setweightText(){
-        weightSlider.maxValue = (float)currentMaxCarryWeight;
-        weightSlider.value = (float)currentCarryWeight;   
-
-        currentCarryWeightText.text = currentCarryWeight.ToString();
-        currentMaxCarryWeightText.text = currentMaxCarryWeight.ToString();
-    }
-
-    public void setMaxDrop(){
-        amountToDropSlider.value = amountToDropSlider.maxValue;
-        setTextAmountDrop();
-    }
-
-    public void setMinDrop(){
-        amountToDropSlider.value = amountToDropSlider.minValue;
-        setTextAmountDrop();
+        inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
+        inventoryUIHandlerScript.setPlayer(gameObject);
     }
 }

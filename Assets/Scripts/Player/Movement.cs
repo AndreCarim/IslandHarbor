@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class Movement : MonoBehaviour
+public class Movement : NetworkBehaviour
 {
     [SerializeField] private CharacterController controller;
     [SerializeField] private float speed = 12f;
@@ -20,20 +21,24 @@ public class Movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        gameObject.GetComponent<CharacterController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(canWalk == true){
-            // Check if the character is grounded by checking for any collider
-            isGrounded = Physics.Raycast(groundCheck.position, Vector3.down, groundDistance);
+        if(!IsOwner){return;}
 
-            if (isGrounded && velocity.y < 0)
-            {
-               velocity.y = -2f;
-            }
+        // Check if the character is grounded by checking for any collider
+        isGrounded = Physics.Raycast(groundCheck.position, Vector3.down, groundDistance);
+
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+        }
+
+        if(canWalk == true){
+            
 
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");

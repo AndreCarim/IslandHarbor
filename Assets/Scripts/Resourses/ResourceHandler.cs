@@ -1,11 +1,12 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 
-public class ResourceHandler : MonoBehaviour
+public class ResourceHandler : NetworkBehaviour
 {
     [SerializeField] private double startHealth;
-    private double currentHealth;
+    [SerializeField] private NetworkVariable<double> currentHealth = new NetworkVariable<double>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private Material defaultMaterial;
     private Material blinkMaterial;
@@ -22,11 +23,10 @@ public class ResourceHandler : MonoBehaviour
 
     private Renderer resourceRenderer; // Reference to the resource renderer
 
-    void Start()
-    {
-        currentHealth = startHealth;
+    public override void OnNetworkSpawn(){
+        if(IsServer){currentHealth.Value = startHealth;}
 
-        // Attempt to get the Renderer component from the same GameObject
+         // Attempt to get the Renderer component from the same GameObject
         resourceRenderer = GetComponent<Renderer>();
 
         if (resourceRenderer == null)
@@ -39,27 +39,35 @@ public class ResourceHandler : MonoBehaviour
         }
     }
 
-    public void giveDamage(double damageAmount, ToolEnum.ToolType toolTypeUsed, GameObject player)
+
+    public void giveDamage(double damageAmount, ToolEnum.ToolType toolTypeUsed)
     {
-        if (currentHealth > 0)
+
+        if (currentHealth.Value > 0)
         {
             if (toolTypeUsed == toolType)
             {
-                currentHealth -= damageAmount;
+                setNewHealthServerRpc(damageAmount);
             }
             else
             {
-                currentHealth -= (damageAmount / 2);
+                setNewHealthServerRpc(damageAmount/2);
             }
-            //Debug.Log(currentHealth);
             StartCoroutine(Effects());
-            checkHealthStats(player);
+            checkHealthStats();
         }
     }
 
-   private void checkHealthStats(GameObject player)
+//run by the server, everyone can call
+    [ServerRpc(RequireOwnership = false)]
+    private void setNewHealthServerRpc(double value){
+        currentHealth.Value -= value;
+    }
+
+
+   private void checkHealthStats()
     {
-        if (currentHealth <= 0)
+        if (currentHealth.Value <= 0)
         {
             // Resource died
             // Get a random number between amountDropFrom (inclusive) and amountDropTo (exclusive)
@@ -170,7 +178,7 @@ public class ResourceHandler : MonoBehaviour
     }
 
     public double getCurrentHealth(){
-        return currentHealth;
+        return currentHealth.Value;
     }
 
     public string getName(){

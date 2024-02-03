@@ -3,23 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
-public class RayCastingHandler : MonoBehaviour
+public class RayCastingHandler : NetworkBehaviour
 {
+    private CenterUIHandler centerUIHandlerScript;
+    private ResourceHPBar resourceHPBarScript;
+
     [SerializeField] private float maxDistanceHit = 4.5f;
     [SerializeField] private float maxDistanceGetDroppedResource = 6.5f;
     [SerializeField] private ToolHandler toolHandler;
-    [SerializeField] private Slider cooldownSlider;
     [SerializeField] private GameObject player;
 
-    [SerializeField] private Color isBreakableCenterColor;
-    [SerializeField] private Color CollectibleResourceCenterColor;
-    [SerializeField] private Image centerDot;
+    [SerializeField] private Color isBreakableCenterColor = new Color(0.9529f, 0.6f, 0.6f); // Assigning a light red color
+    [SerializeField] private Color CollectibleResourceCenterColor = new Color(0.6039f, 0.9804f, 0.6745f); // Assigning a color close to #9FFAAC
 
-    [SerializeField] private GameObject hPTopScreen; // Health bar UI
-    [SerializeField] private TextMeshProUGUI hpTopScreenText; // Health bar text
-    [SerializeField] private Slider hpTopScreenSlider; // Health bar slider
-    [SerializeField] private TextMeshProUGUI hpTextAnimation;
 
     private GameObject activeTooltip;
     [SerializeField] private GameObject tooltipPrefab; // Prefab for the tooltip UI
@@ -28,21 +26,23 @@ public class RayCastingHandler : MonoBehaviour
     private bool inventoryIsOpen = false;
     private bool clickedMouse = false; // Flag for left mouse button click
 
-    // Previous health value to track changes
-    private float previousHealthValue = float.MinValue;
+   
 
-    void Start()
-    {
-        cooldownSlider.gameObject.SetActive(false); // Disable cooldown slider at start
-    }
 
     void Update()
     {
+
+         // Check if the current client is the owner of the player object
+        if (!IsOwner || !Camera.main)
+        {
+            // If not the owner, return and do not perform any actions
+            return;
+        }
+
         ClearTooltip(); // Clear any active tooltip
 
         // Cast a ray from the center of the screen
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
-        
         bool canPerformAction = canClick && toolHandler.getCurrentTool() != null;
 
         // Check if the player is holding down or has pressed the left mouse button
@@ -81,29 +81,24 @@ public class RayCastingHandler : MonoBehaviour
                     {
                         //damage is given to the isBreakable object
                         ToolGenericHandler currentTool = toolHandler.getCurrentTool();
-                        resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getToolType(), player);
-                        // Animate hpTextAnimation
-                        StartCoroutine(AnimateHPText());
-                        // Shake the slider
-                        StartCoroutine(ShakeSlider(hpTopScreenSlider));
-                        // Briefly change the color to red and then back to white
-                        StartCoroutine(ChangeSliderColor(hpTopScreenSlider));
+                        resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getToolType());
+                        resourceHPBarScript.startCoroutines();
                     }
                 }
-                setHpBar(resourceHandler); // Update health bar
-                centerDot.color = isBreakableCenterColor; // Set center dot color
+                resourceHPBarScript.setHpBar(resourceHandler); // Update health bar
+                centerUIHandlerScript.setCenterDotColor(isBreakableCenterColor);
             }
             else
             {
-                hPTopScreen.SetActive(false); // Deactivate health bar for non-breakable objects
+                resourceHPBarScript.setActiveHPBar(false);// Deactivate health bar for non-breakable objects
             }
         }
         else
         {
             // If not hitting anything
-            hPTopScreen.SetActive(false); // Deactivate health bar when no hit is detected
-            centerDot.color = Color.white; // Set center dot color to default
-            previousHealthValue = 0f;
+            resourceHPBarScript.setActiveHPBar(false); // Deactivate health bar when no hit is detected
+            centerUIHandlerScript.setCenterDotColor(Color.white); // Set center dot color to default
+            resourceHPBarScript.resetPreviousHealthValue();
         }
     }
 
@@ -116,7 +111,7 @@ public class RayCastingHandler : MonoBehaviour
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource") && !inventoryIsOpen)
             {
-                centerDot.color = CollectibleResourceCenterColor; // Set center dot color for collectible resources
+                centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
 
                 if(Input.GetKeyDown(KeyCode.E))
                 {
@@ -130,31 +125,7 @@ public class RayCastingHandler : MonoBehaviour
         }
     }
 
-    // Update health bar of breakable objects
-    private void setHpBar(ResourceHandler resourceHandler)
-    {
-        // Activate health bar if not already active
-        if (!hPTopScreen.activeSelf)
-        {
-            hPTopScreen.SetActive(true);
-            hpTopScreenText.text = resourceHandler.getName(); // Update health bar text
-        }
-
-        // Only update if the health value has changed or the UI becomes visible
-        if (hPTopScreen.activeSelf && (float)resourceHandler.getCurrentHealth() != previousHealthValue)
-        {
-            // Convert double values to float for Slider component
-            float maxHealth = (float)resourceHandler.getStartHealth();
-            float currentHealth = (float)resourceHandler.getCurrentHealth();
-
-            // Set the values to the Slider
-            hpTopScreenSlider.maxValue = maxHealth;
-            hpTopScreenSlider.value = currentHealth;
-
-            // Update the previous health value
-            previousHealthValue = currentHealth;
-        }
-    }
+    
 
     // Coroutine for cooldown of tool actions
     IEnumerator ClickCooldown(ToolGenericHandler currentTool)
@@ -162,22 +133,16 @@ public class RayCastingHandler : MonoBehaviour
         canClick = false;
         float cooldownTime = currentTool.getDebounceTime();
 
-        // Enable the slider before starting the cooldown
-        cooldownSlider.gameObject.SetActive(true);
-        cooldownSlider.value = 1f;
+        centerUIHandlerScript.startCooldownSlider();
 
         while (cooldownTime > 0f)
         {
             cooldownTime -= Time.deltaTime;
-            cooldownSlider.value = cooldownTime / currentTool.getDebounceTime();
+            centerUIHandlerScript.setCooldownSlider(cooldownTime / currentTool.getDebounceTime());
             yield return null;
         }
 
-        // Ensure the slider is set to 0 when the cooldown is complete
-        cooldownSlider.value = 0f;
-
-        // Disable the slider after the cooldown
-        cooldownSlider.gameObject.SetActive(false);
+       centerUIHandlerScript.endCooldownSlider();
 
         // Reset the canClick flag after the cooldown
         canClick = true;
@@ -251,52 +216,10 @@ public class RayCastingHandler : MonoBehaviour
         }
     }
 
-    #region hpSlider animations
-   // Coroutine to shake the slider
-    private IEnumerator ShakeSlider(Slider slider)
-    {
-        Vector3 originalPosition = slider.transform.position;
-        float shakeAmount = 10f; // Increase shake amount
-        float shakeDuration = 0.3f; // Increase shake duration
-        float elapsed = 0f;
+    public void setOnStart( GameObject entirePlayerUIInstance){
+    
 
-        while (elapsed < shakeDuration)
-        {
-            float x = Random.Range(-1f, 1f) * shakeAmount;
-            float y = Random.Range(-1f, 1f) * shakeAmount;
-
-            slider.transform.position = originalPosition + new Vector3(x, y, 0);
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        // Reset slider position
-        slider.transform.position = originalPosition;
+        centerUIHandlerScript = entirePlayerUIInstance.GetComponent<CenterUIHandler>();
+        resourceHPBarScript = entirePlayerUIInstance.GetComponent<ResourceHPBar>();
     }
-
-    // Coroutine to change the color of the slider briefly
-    private IEnumerator ChangeSliderColor(Slider slider)
-    {
-        Color originalColor = slider.fillRect.GetComponent<Image>().color; // Store current color
-        
-        // Define a softer red color with reduced intensity
-        Color softerRedColor = new Color(1f, 0.5f, 0.5f); // Adjust the values as needed
-        
-        slider.fillRect.GetComponent<Image>().color = softerRedColor; // Change to softer red color
-
-        yield return new WaitForSeconds(0.1f); // Adjust duration as needed
-
-        slider.fillRect.GetComponent<Image>().color = originalColor; // Restore original color
-    }
-
-    // Coroutine to animate hpTextAnimation
-    private IEnumerator AnimateHPText()
-    {
-        // Add your animation logic for hpTextAnimation here
-        // For example, you can use LeanTween or other animation libraries
-        // to make the text animate from the center of the slider
-        yield return null;
-    }
-    #endregion
 }
