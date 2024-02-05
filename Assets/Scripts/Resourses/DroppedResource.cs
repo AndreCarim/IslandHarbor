@@ -1,26 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class DroppedResource : MonoBehaviour
+public class DroppedResource : NetworkBehaviour
 {
-    private float minDestroyTime = 60f; // Minimum time before auto destruction
-    private float maxDestroyTime = 120f; // Maximum time before auto destruction
-
     private int amount;
     private ResourceGenericHandler resource;
 
-    void Start()
-    {   // Generate a random time interval for destruction
-        float destroyTime = Random.Range(minDestroyTime, maxDestroyTime);
+    public override void OnNetworkSpawn()
+    {   
+        if(IsServer) {
+            // Generate a random time interval for destruction
+            float destroyTime = 10f;
+
+            // Destroy the GameObject after the random time interval
+            Destroy(gameObject, destroyTime);
+        }
         
-        // Destroy the GameObject after the random time interval
-        Destroy(gameObject, destroyTime);
+
+         // Change the layer to "ResourceFloating"
+        gameObject.layer = LayerMask.NameToLayer("CollectibleResource");
+        
     }
 
-    public void setResource(int amount, ResourceGenericHandler resource)
+    public void setResource(int amountFromServer, ResourceGenericHandler resource)
     {
-        this.amount = amount;
+        amount = amountFromServer;
         this.resource = resource;
     }
 

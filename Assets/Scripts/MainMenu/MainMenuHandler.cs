@@ -9,7 +9,7 @@ public class MainMenuHandler : MonoBehaviour
     [SerializeField] private Button startHostButton;
     [SerializeField] private Button startClientButton;
 
-    [SerializeField] private Camera testCamera;//
+
 
     private void Awake(){
         startHostButton.onClick.AddListener(() => {

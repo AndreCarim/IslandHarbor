@@ -41,9 +41,8 @@ public class ResourceHandler : NetworkBehaviour
 
 
     public void giveDamage(double damageAmount, ToolEnum.ToolType toolTypeUsed)
-    {
-
-        if (currentHealth.Value > 0)
+    {      
+        if (currentHealth.Value >= 0)
         {
             if (toolTypeUsed == toolType)
             {
@@ -54,19 +53,21 @@ public class ResourceHandler : NetworkBehaviour
                 setNewHealthServerRpc(damageAmount/2);
             }
             StartCoroutine(Effects());
-            checkHealthStats();
         }
     }
 
-//run by the server, everyone can call
+    //run by the server, everyone can call
     [ServerRpc(RequireOwnership = false)]
     private void setNewHealthServerRpc(double value){
         currentHealth.Value -= value;
-    }
 
+        checkHealthStats();
+    }
 
    private void checkHealthStats()
     {
+        if(!IsServer) return;
+
         if (currentHealth.Value <= 0)
         {
             // Resource died
@@ -88,20 +89,14 @@ public class ResourceHandler : NetworkBehaviour
                 // Check if the calculated center is valid
                 if (!float.IsNaN(center.x) && !float.IsNaN(center.y) && !float.IsNaN(center.z))
                 {
-                    // Instantiate the item at the center of the original GameObject
-                    GameObject droppedItem = Instantiate(resourceDrop.getDropGameObject(), center, Quaternion.identity);
-                    droppedItem.AddComponent<DroppedResource>();
-
-                    droppedItem.GetComponent<DroppedResource>().setResource(randomAmount, resourceDrop);
-
-                    // Change the layer to "ResourceFloating"
-                    droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
-
+                    
+                    dropItem(center, randomAmount);
                     // Enable colliders after instantiation
                     collider.enabled = true;
 
                     // Destroy the original GameObject
-                    Destroy(gameObject);
+                    destroyGameObject();
+                    
                 }
                 else
                 {
@@ -110,6 +105,54 @@ public class ResourceHandler : NetworkBehaviour
                     collider.enabled = true;
                 }
             }
+        }
+    }
+
+    // RPC to destroy the object on all clients
+    private void destroyGameObject()
+    {   
+        if(!IsServer) return;
+        // Destroy the object on all clients
+        gameObject.GetComponent<NetworkObject>().Despawn(true);
+    }
+
+
+    private void dropItem(Vector3 center, int randomAmount){
+        // Check if this instance is the server
+        if (!IsServer) return;
+
+        // Instantiate the item at the center of the original GameObject
+        GameObject droppedItem = Instantiate(resourceDrop.getDropGameObject(), center, Quaternion.identity);
+
+        // Get the NetworkObject component of the instantiated item
+        NetworkObject objectInNetwork = droppedItem.GetComponent<NetworkObject>();
+
+        // Spawn the item across the network
+        objectInNetwork.GetComponent<NetworkObject>().Spawn();
+
+        // Call the client RPC to synchronize resource information
+        setResourceInfoClientRpc(droppedItem.GetComponent<NetworkObject>().NetworkObjectId, randomAmount);
+    }
+
+    // Client RPC method to synchronize resource information
+    [ClientRpc]
+    private void setResourceInfoClientRpc(ulong objectId, int randomAmount){
+        // Find the object with the specified network ID
+        NetworkObject networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId];
+
+        // Check if the object exists
+        if (networkObject){
+            // Add or get the DroppedResource component of the object
+            DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
+            if (droppedResourceComponent == null) {
+                droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
+            }
+
+            // Set the resource information
+            droppedResourceComponent.setResource(randomAmount, resourceDrop);
+
+            // Notify the DroppedResource component that it has been spawned over the network
+            droppedResourceComponent.OnNetworkSpawn();
         }
     }
 

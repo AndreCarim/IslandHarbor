@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using Unity.Netcode;
 
+
 public class ResourceInventory : NetworkBehaviour
 {
     // This dictionary will store the item ID as the key and the quantity as the value.
@@ -27,7 +28,6 @@ public class ResourceInventory : NetworkBehaviour
     private Camera mainCamera;
 
     private Coroutine shakeCoroutine;
-   
 
     void Start(){
         mainCamera = Camera.main;
@@ -97,8 +97,9 @@ public class ResourceInventory : NetworkBehaviour
                 currentCarryWeight += maxAmount * resource.getWeight();
 
                 //drop the remaining
-                dropItemInFrontOfThePlayer(amount - maxAmount, resource, true);
+                dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, collectibleResource.GetComponent<NetworkObject>().NetworkObjectId, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
             }
+                
             
         }else
         {
@@ -125,14 +126,31 @@ public class ResourceInventory : NetworkBehaviour
 
                 currentCarryWeight += maxAmount * resource.getWeight();
                 //drop the remaining
-               dropItemInFrontOfThePlayer(amount - maxAmount, resource, true);
+                
+               dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, collectibleResource.GetComponent<NetworkObject>().NetworkObjectId, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
             }
         }
 
         // Create UI for the new resource
         inventoryUIHandlerScript.CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
-        Destroy(collectibleResource);
+
+        //destroy via server so all the clients will get
+        destroyObjectServerRpc(collectibleResource.GetComponent<NetworkObject>().NetworkObjectId);
+
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void destroyObjectServerRpc(ulong objectId){
+        // Find the object with the specified network ID
+        NetworkObject networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId];
+
+        if(networkObject){
+            networkObject.Despawn();
+        }
+    }
+
+    
+
 
     // Method to remove a resource from the inventory
     public void RemoveResource(ResourceGenericHandler resource, int amount)
@@ -194,14 +212,14 @@ public class ResourceInventory : NetworkBehaviour
             // Check if the player has enough resource
             int amountToDrop = inventoryUIHandlerScript.getAmountToDropSlider();
             if (amountPlayerHas >= amountToDrop)
-            {//inventoryUIHandler
+            {
 
                 inventoryUIHandlerScript.stopCoroutine();
 
                 currentCarryWeight -= resourceSelected.getWeight() * amountToDrop;
 
                 RemoveResource(resourceSelected, amountToDrop); //from the inventory ui  
-                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false);   
+                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false, 0, 0f, 0f, 0f);   
                 
                 inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
             }
@@ -213,44 +231,133 @@ public class ResourceInventory : NetworkBehaviour
         }
     }
 
-    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop, bool isExtra){   
+    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop, bool isExtra, ulong objectToCollectId, float x, float y, float z){   
+        
           // Check if the client is the owner of the object
         if (!IsOwner)
             return; // Exit the method if not the owner
         
-        // Calculate the center of the GameObject
-        Vector3 positionToDrop = calculatePositionToDrop();
-
-        // Instantiate the item at the center of the original GameObject
-        GameObject droppedItem = Instantiate(resourceToDrop.getDropGameObject(), positionToDrop, Quaternion.identity);
-        droppedItem.AddComponent<DroppedResource>();
-
-        droppedItem.GetComponent<DroppedResource>().setResource(amountToDrop, resourceToDrop);
-
-        // Change the layer to "ResourceFloating"
-        droppedItem.layer = LayerMask.NameToLayer("CollectibleResource");
 
         if(!isExtra){//meaning that it is dropping from the inventory, if its true, its dropping
+            //resource dropped from inventory
+            instantiateItemFromDroppingInServerRpc(amountToDrop, x, y, z);
+            
             if(resourceCountDictionary.ContainsKey(resourceSelected.getId())){
                 inventoryUIHandlerScript.setItemInformation(resourceToDrop, resourceCountDictionary.ContainsKey(resourceSelected.getId()), resourceCountDictionary[resourceSelected.getId()]);
             }  
+        }else{
+            //resource dropped from max weight
+            //its dropping because player cant take more weight
+            instantiateItemFromCollectingInServerRpc(amountToDrop, objectToCollectId, x, y, z);
         }
     }
 
-    private Vector3 calculatePositionToDrop()
+    //TO DROP FROM MAX WEIGHT
+    [ServerRpc(RequireOwnership = false)]
+    private void instantiateItemFromCollectingInServerRpc(int amountToDrop, ulong objectToCollectId, float x, float y, float z){
+
+         // Check if this instance is the server
+        if (!IsServer) return;
+
+         // Find the object with the specified network ID
+        NetworkObject objectToCollectNetwork = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectToCollectId];
+
+        
+        
+        // Instantiate the item at the center of the original GameObject
+        GameObject droppedItem = Instantiate(objectToCollectNetwork.GetComponent<DroppedResource>().getResource().getDropGameObject(), new Vector3(x, y, z), Quaternion.identity);
+
+        // Get the NetworkObject component of the instantiated item
+        NetworkObject objectInNetwork = droppedItem.GetComponent<NetworkObject>();
+
+        // Spawn the item across the network
+        objectInNetwork.GetComponent<NetworkObject>().Spawn();
+         // Call the client RPC to synchronize resource information
+        setResourceInfoFromCollectingClientRpc(droppedItem.GetComponent<NetworkObject>().NetworkObjectId, amountToDrop, objectToCollectId);
+    }
+
+    [ClientRpc]
+    private void setResourceInfoFromCollectingClientRpc(ulong objectId, int randomAmount, ulong objectToCollectId){
+        // Find the object with the specified network ID
+        NetworkObject objectToCollectNetwork = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectToCollectId];
+
+        // Find the object with the specified network ID
+        NetworkObject networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId];
+
+        // Check if the object exists
+        if (networkObject && objectToCollectNetwork){
+            // Add or get the DroppedResource component of the object
+            DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
+            if (droppedResourceComponent == null) {
+                droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
+            }
+            // Set the resource information
+            droppedResourceComponent.setResource(randomAmount, objectToCollectNetwork.GetComponent<DroppedResource>().getResource());
+
+            // Notify the DroppedResource component that it has been spawned over the network
+            droppedResourceComponent.OnNetworkSpawn();
+        }
+    }
+    //TO DROP FROM MAX WEIGHT
+
+
+    //TO DROP FROM INVENTORY
+    [ServerRpc(RequireOwnership = false)]
+    private void instantiateItemFromDroppingInServerRpc(int amount, float x, float y, float z){
+       
+    }
+
+    [ClientRpc]
+    private void setResourceInfoFromDroppingClientRpc(ulong objectId, int amount){
+        
+    }
+    //TO DROP FROM INVENTORY
+    
+
+    private float CalculateXPositionToDrop()
     {
         // Ensure we have a main camera
         if (mainCamera == null)
         {
             Debug.LogError("Main camera not found!");
-            return Vector3.zero;
+            return 0f;
         }
 
-        // Calculate the position in front of the camera
+        // Calculate the x position in front of the camera
         float distanceFromCamera = 1.5f; // Adjust this value to control the distance from the camera
-        Vector3 positionInFrontOfCamera = mainCamera.transform.position + mainCamera.transform.forward * distanceFromCamera;
+        float xPositionInFrontOfCamera = mainCamera.transform.position.x + mainCamera.transform.forward.x * distanceFromCamera;
 
-        return positionInFrontOfCamera;
+        return xPositionInFrontOfCamera;
+    }
+
+    private float CalculateYPositionToDrop()
+    {
+        // Ensure we have a main camera
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera not found!");
+            return 0f;
+        }
+
+        // Calculate the y position in front of the camera
+        // For simplicity, let's just return the y position of the camera
+        return mainCamera.transform.position.y;
+    }
+
+    private float CalculateZPositionToDrop()
+    {
+        // Ensure we have a main camera
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera not found!");
+            return 0f;
+        }
+
+        // Calculate the z position in front of the camera
+        float distanceFromCamera = 1.5f; // Adjust this value to control the distance from the camera
+        float zPositionInFrontOfCamera = mainCamera.transform.position.z + mainCamera.transform.forward.z * distanceFromCamera;
+
+        return zPositionInFrontOfCamera;
     }
 
     public void setOnStart(GameObject entirePlayerUIInstance){
