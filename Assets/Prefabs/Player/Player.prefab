@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4211156459
+  GlobalObjectIdHash: 2548080668
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -234,6 +234,7 @@ MonoBehaviour:
   clickScript: {fileID: 4607921090760594962}
   currentMaxCarryWeight: 100
   currentCarryWeight: 0
+  resourceList: {fileID: 11400000, guid: 7b4a4db27c4e14dab811a1f46cc0877f, type: 2}
 --- !u!114 &4719835096224029864
 MonoBehaviour:
   m_ObjectHideFlags: 0

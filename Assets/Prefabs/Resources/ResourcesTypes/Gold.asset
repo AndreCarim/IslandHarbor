@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceName: Gold
   icon: {fileID: 21300000, guid: d1b5a8d59ab2d6a4683644e5628b0ea2, type: 3}
-  id: 3
+  id: 2
   dropGameObject: {fileID: 1819027836624584374, guid: 686506779476a44f2b8268d2952994c5, type: 3}
-  maxAmountInInventory: 999
+  weight: 0
   informationText: Precious metal, coveted treasure. Sparks dreams, unlocks opportunity.

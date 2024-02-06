@@ -29,6 +29,8 @@ public class ResourceInventory : NetworkBehaviour
 
     private Coroutine shakeCoroutine;
 
+    [SerializeField] private ResourceList resourceList;
+
     void Start(){
         mainCamera = Camera.main;
     }
@@ -219,7 +221,7 @@ public class ResourceInventory : NetworkBehaviour
                 currentCarryWeight -= resourceSelected.getWeight() * amountToDrop;
 
                 RemoveResource(resourceSelected, amountToDrop); //from the inventory ui  
-                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false, 0, 0f, 0f, 0f);   
+                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false, 0, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());   
                 
                 inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
             }
@@ -240,7 +242,7 @@ public class ResourceInventory : NetworkBehaviour
 
         if(!isExtra){//meaning that it is dropping from the inventory, if its true, its dropping
             //resource dropped from inventory
-            instantiateItemFromDroppingInServerRpc(amountToDrop, x, y, z);
+            instantiateItemFromDroppingInServerRpc(amountToDrop, resourceToDrop.getId(), x, y, z);
             
             if(resourceCountDictionary.ContainsKey(resourceSelected.getId())){
                 inventoryUIHandlerScript.setItemInformation(resourceToDrop, resourceCountDictionary.ContainsKey(resourceSelected.getId()), resourceCountDictionary[resourceSelected.getId()]);
@@ -262,8 +264,6 @@ public class ResourceInventory : NetworkBehaviour
          // Find the object with the specified network ID
         NetworkObject objectToCollectNetwork = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectToCollectId];
 
-        
-        
         // Instantiate the item at the center of the original GameObject
         GameObject droppedItem = Instantiate(objectToCollectNetwork.GetComponent<DroppedResource>().getResource().getDropGameObject(), new Vector3(x, y, z), Quaternion.identity);
 
@@ -273,7 +273,7 @@ public class ResourceInventory : NetworkBehaviour
         // Spawn the item across the network
         objectInNetwork.GetComponent<NetworkObject>().Spawn();
          // Call the client RPC to synchronize resource information
-        setResourceInfoFromCollectingClientRpc(droppedItem.GetComponent<NetworkObject>().NetworkObjectId, amountToDrop, objectToCollectId);
+        setResourceInfoFromCollectingClientRpc(objectInNetwork.NetworkObjectId, amountToDrop, objectToCollectId);
     }
 
     [ClientRpc]
@@ -303,13 +303,46 @@ public class ResourceInventory : NetworkBehaviour
 
     //TO DROP FROM INVENTORY
     [ServerRpc(RequireOwnership = false)]
-    private void instantiateItemFromDroppingInServerRpc(int amount, float x, float y, float z){
-       
+    private void instantiateItemFromDroppingInServerRpc(int amount, int resourceIndex, float x, float y, float z){
+         // Check if this instance is the server
+        if (!IsServer) return;
+
+        //Getting the resourceDropped
+        ResourceGenericHandler resourceDropped = resourceList.resourceList[resourceIndex];
+
+        if(resourceDropped){
+             // Instantiate the item at the center of the original GameObject
+            GameObject droppedItem = Instantiate(resourceDropped.getDropGameObject(), new Vector3(x, y, z), Quaternion.identity);
+            
+            // Get the NetworkObject component of the instantiated item
+            NetworkObject objectInNetwork = droppedItem.GetComponent<NetworkObject>();
+
+            // Spawn the item across the network
+            objectInNetwork.GetComponent<NetworkObject>().Spawn();
+            // Call the client RPC to synchronize resource information
+            setResourceInfoFromDroppingClientRpc(objectInNetwork.NetworkObjectId, amount, resourceIndex);
+        }
+
     }
 
     [ClientRpc]
-    private void setResourceInfoFromDroppingClientRpc(ulong objectId, int amount){
-        
+    private void setResourceInfoFromDroppingClientRpc(ulong objectId, int amount, int resourceIndex){
+        // Find the object with the specified network ID
+        NetworkObject networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId];
+
+        // Check if the object exists
+        if (networkObject){
+            // Add or get the DroppedResource component of the object
+            DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
+            if (droppedResourceComponent == null) {
+                droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
+            }
+            // Set the resource information
+            droppedResourceComponent.setResource(amount, resourceList.resourceList[resourceIndex]);
+
+            // Notify the DroppedResource component that it has been spawned over the network
+            droppedResourceComponent.OnNetworkSpawn();
+        }
     }
     //TO DROP FROM INVENTORY
     
