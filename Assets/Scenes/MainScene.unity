@@ -1832,7 +1832,7 @@ MonoBehaviour:
   startHealth: 150
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
+  resourceDrop: {fileID: 11400000, guid: acc01dfb703e84578afaa4b38e6689f4, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   toolType: 0

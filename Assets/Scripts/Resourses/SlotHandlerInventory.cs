@@ -59,7 +59,7 @@ public class SlotHandlerInventory : MonoBehaviour, IPointerEnterHandler, IPointe
                 Debug.LogError("Required components not found.");
             }
 
-            SetText(resource.getResourceName());
+            SetText(resource.getName());
             toolTip.SetActive(true);
 
             // Update tooltip position immediately on enter

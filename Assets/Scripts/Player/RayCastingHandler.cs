@@ -43,12 +43,12 @@ public class RayCastingHandler : NetworkBehaviour
 
         // Cast a ray from the center of the screen
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
-        bool canPerformAction = canClick && toolHandler.getCurrentTool() != null;
+        bool canPerformAction = canClick && toolHandler.getCurrentEquipment() != null;
 
         // Check if the player is holding down or has pressed the left mouse button
         if (!inventoryIsOpen && canPerformAction && (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
         {
-            StartCoroutine(ClickCooldown(toolHandler.getCurrentTool())); // Start cooldown
+            StartCoroutine(ClickCooldown(toolHandler.getCurrentEquipment())); // Start cooldown
             clickedMouse = true;
         }
 
@@ -80,8 +80,8 @@ public class RayCastingHandler : NetworkBehaviour
                     if (resourceHandler != null)
                     {
                         //damage is given to the isBreakable object
-                        ToolGenericHandler currentTool = toolHandler.getCurrentTool();
-                        resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getToolType());
+                        ResourceGenericHandler currentTool = toolHandler.getCurrentEquipment();
+                        resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getResourceType());
                         resourceHPBarScript.startCoroutines();
                     }
                 }
@@ -128,7 +128,8 @@ public class RayCastingHandler : NetworkBehaviour
     
 
     // Coroutine for cooldown of tool actions
-    IEnumerator ClickCooldown(ToolGenericHandler currentTool)
+    //only weapons, pickaxes and axes can have cooldown
+    IEnumerator ClickCooldown(ResourceGenericHandler currentTool)
     {
         canClick = false;
         float cooldownTime = currentTool.getDebounceTime();
@@ -207,7 +208,7 @@ public class RayCastingHandler : NetworkBehaviour
         TextMeshPro textMeshPro = toolTip.GetComponent<TextMeshPro>();
         if (textMeshPro)
         {
-            string resourceName = "<color=red>" + resource.getResource().getResourceName() + "</color>";
+            string resourceName = "<color=red>" + resource.getResource().getName() + "</color>";
             string amountText = "<color=green>Qty: " + resource.getAmount() + "</color>";
             string weightText = "<color=white>" + resource.getResource().getWeight().ToString() + "/" + (resource.getResource().getWeight() * resource.getAmount()).ToString()+ "</color>";
             string instructionText = "<color=blue>Press E to collect</color>";

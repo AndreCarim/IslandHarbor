@@ -16,8 +16,8 @@ public class ResourceInventory : NetworkBehaviour
 
     private InventoryUIHandler inventoryUIHandlerScript;
 
-    [SerializeField] private FirstPersonCameraHandler cameraScript;
-    [SerializeField] private Movement movementScript;
+    [SerializeField] private CameraInput cameraScript;
+    [SerializeField] private InputMovement movementScript;
     [SerializeField] private RayCastingHandler clickScript;
 
     [SerializeField] private int currentMaxCarryWeight = 500;
@@ -68,8 +68,8 @@ public class ResourceInventory : NetworkBehaviour
         }
     }
 
-    // Method to add a resource to the inventory
-    public void AddResource(ResourceGenericHandler resource, int amount, GameObject collectibleResource)
+    // Method to add a resource to the inventory, called by the raycastingHandler script
+    public void AddResource(ResourceGenericHandler resource, int amount, GameObject collectibleResource = null)
     {
           // Check if the client is the owner of the object
         if (!IsOwner)
@@ -99,7 +99,14 @@ public class ResourceInventory : NetworkBehaviour
                 currentCarryWeight += maxAmount * resource.getWeight();
 
                 //drop the remaining
-                dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, collectibleResource.GetComponent<NetworkObject>().NetworkObjectId, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
+                if(collectibleResource){
+                     //it means that the addResoure is being called by the raycastHandler, the player is trying to get an item
+                    //from the floor and it has no space in the inventory, so it will drop in front of him
+                    //so i need to send the networkobjectid to the dropiteminfrontoftheplayer so it can know which kind of object it needs to destroy
+                    dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop(), collectibleResource.GetComponent<NetworkObject>().NetworkObjectId);
+                }else{
+                    dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
+                }
             }
                 
             
@@ -127,18 +134,30 @@ public class ResourceInventory : NetworkBehaviour
                 resourceCountDictionary.Add(resource.getId(), maxAmount);
 
                 currentCarryWeight += maxAmount * resource.getWeight();
+
                 //drop the remaining
-                
-               dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, collectibleResource.GetComponent<NetworkObject>().NetworkObjectId, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
+                if(collectibleResource){
+                     //it means that the addResoure is being called by the raycastHandler, the player is trying to get an item
+                    //from the floor and it has no space in the inventory, so it will drop in front of him
+                    //so i need to send the networkobjectid to the dropiteminfrontoftheplayer so it can know which kind of object it needs to destroy
+                    dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop(), collectibleResource.GetComponent<NetworkObject>().NetworkObjectId);
+                }else{
+                    dropItemInFrontOfThePlayer(amount - maxAmount, resource, true, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
+                }
+               
             }
         }
 
         // Create UI for the new resource
         inventoryUIHandlerScript.CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
 
-        //destroy via server so all the clients will get
-        destroyObjectServerRpc(collectibleResource.GetComponent<NetworkObject>().NetworkObjectId);
-
+        if(collectibleResource){
+             //destroy via server so all the clients will get
+             //only will do if the player is trying to get the resource from the floor
+             //if its from the inventory or when the player earns from npc, it dosent need to call destroy
+             //since there is no object to destroy in the game
+             destroyObjectServerRpc(collectibleResource.GetComponent<NetworkObject>().NetworkObjectId);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -184,6 +203,8 @@ public class ResourceInventory : NetworkBehaviour
 
                 inventoryUIHandlerScript.StartShaking();
             }
+
+            currentCarryWeight -= resource.getWeight() * amount;
         }
     }
 
@@ -218,10 +239,8 @@ public class ResourceInventory : NetworkBehaviour
 
                 inventoryUIHandlerScript.stopCoroutine();
 
-                currentCarryWeight -= resourceSelected.getWeight() * amountToDrop;
-
                 RemoveResource(resourceSelected, amountToDrop); //from the inventory ui  
-                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false, 0, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());   
+                dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());   
                 
                 inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
             }
@@ -233,14 +252,14 @@ public class ResourceInventory : NetworkBehaviour
         }
     }
 
-    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop, bool isExtra, ulong objectToCollectId, float x, float y, float z){   
+    private void dropItemInFrontOfThePlayer(int amountToDrop, ResourceGenericHandler resourceToDrop, bool isExtra, float x, float y, float z, ulong objectToCollectId = 0){   
         
           // Check if the client is the owner of the object
         if (!IsOwner)
             return; // Exit the method if not the owner
         
 
-        if(!isExtra){//meaning that it is dropping from the inventory, if its true, its dropping
+        if(!isExtra){//meaning that it is dropping from the inventory, if its true, its dropping from inventory
             //resource dropped from inventory
             instantiateItemFromDroppingInServerRpc(amountToDrop, resourceToDrop.getId(), x, y, z);
             
@@ -250,7 +269,9 @@ public class ResourceInventory : NetworkBehaviour
         }else{
             //resource dropped from max weight
             //its dropping because player cant take more weight
-            instantiateItemFromCollectingInServerRpc(amountToDrop, objectToCollectId, x, y, z);
+            if(objectToCollectId != 0){
+                instantiateItemFromCollectingInServerRpc(amountToDrop, objectToCollectId, x, y, z);
+            }
         }
     }
 
@@ -270,6 +291,11 @@ public class ResourceInventory : NetworkBehaviour
         // Get the NetworkObject component of the instantiated item
         NetworkObject objectInNetwork = droppedItem.GetComponent<NetworkObject>();
 
+         //add a droppedResource to the server copy and call the onnetworkspawn so it can get destroyed.
+        DroppedResource droppedResourceComponentServer = addResourceComponent(objectInNetwork);
+
+        droppedResourceComponentServer.OnNetworkSpawn();
+
         // Spawn the item across the network
         objectInNetwork.GetComponent<NetworkObject>().Spawn();
          // Call the client RPC to synchronize resource information
@@ -287,10 +313,8 @@ public class ResourceInventory : NetworkBehaviour
         // Check if the object exists
         if (networkObject && objectToCollectNetwork){
             // Add or get the DroppedResource component of the object
-            DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
-            if (droppedResourceComponent == null) {
-                droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
-            }
+            DroppedResource droppedResourceComponent = addResourceComponent(networkObject);           
+
             // Set the resource information
             droppedResourceComponent.setResource(randomAmount, objectToCollectNetwork.GetComponent<DroppedResource>().getResource());
 
@@ -299,6 +323,7 @@ public class ResourceInventory : NetworkBehaviour
         }
     }
     //TO DROP FROM MAX WEIGHT
+
 
 
     //TO DROP FROM INVENTORY
@@ -317,6 +342,11 @@ public class ResourceInventory : NetworkBehaviour
             // Get the NetworkObject component of the instantiated item
             NetworkObject objectInNetwork = droppedItem.GetComponent<NetworkObject>();
 
+             //add a droppedResource to the server copy and call the onnetworkspawn so it can get destroyed.
+            DroppedResource droppedResourceComponentServer = addResourceComponent(objectInNetwork);
+
+            droppedResourceComponentServer.OnNetworkSpawn();
+
             // Spawn the item across the network
             objectInNetwork.GetComponent<NetworkObject>().Spawn();
             // Call the client RPC to synchronize resource information
@@ -333,10 +363,8 @@ public class ResourceInventory : NetworkBehaviour
         // Check if the object exists
         if (networkObject){
             // Add or get the DroppedResource component of the object
-            DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
-            if (droppedResourceComponent == null) {
-                droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
-            }
+            DroppedResource droppedResourceComponent = addResourceComponent(networkObject);
+            
             // Set the resource information
             droppedResourceComponent.setResource(amount, resourceList.resourceList[resourceIndex]);
 
@@ -346,6 +374,43 @@ public class ResourceInventory : NetworkBehaviour
     }
     //TO DROP FROM INVENTORY
     
+    private DroppedResource addResourceComponent(NetworkObject networkObject){
+        DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
+        if (droppedResourceComponent == null) {
+            droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
+        }
+
+        return droppedResourceComponent;
+    }
+
+    /*
+    this will be called when the client presses the equipButton on the inventory
+    Then this will check which kind of equipment the client is trying to equip
+    then it will call the ToolHandler so the equip can happen
+    then it will take the last tool put it back to the inventory and then 
+    /destroy the last equipment button inside the inventory
+    */
+    public void equipButtonPressed(){
+        if(!IsOwner) return;
+
+        if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.Axe){
+            //equipping an axe
+            
+
+            gameObject.GetComponent<ToolHandler>().setCurrentAxe(resourceSelected);
+        }else if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.PickAxe){
+            //equipping a pickAxe
+            gameObject.GetComponent<ToolHandler>().setCurrentPickAxe(resourceSelected);
+        }else if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.Weapon){
+            //equipping a Weapon
+            ResourceGenericHandler currentResource = gameObject.GetComponent<ToolHandler>().getCurrentWeapon();
+
+            gameObject.GetComponent<ToolHandler>().setCurrentWeapon(resourceSelected);     
+
+            RemoveResource(resourceSelected, 1);     
+            AddResource(currentResource, 1);
+        }
+    }
 
     private float CalculateXPositionToDrop()
     {

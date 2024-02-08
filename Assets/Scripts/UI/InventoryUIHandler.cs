@@ -29,6 +29,8 @@ public class InventoryUIHandler : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI currentMaxCarryWeightText;
     [SerializeField] private TextMeshProUGUI currentCarryWeightText;
 
+    [SerializeField] private GameObject equipButton;
+
     private GameObject player;
 
     private int currentMaxCarryWeight;
@@ -137,7 +139,7 @@ public class InventoryUIHandler : NetworkBehaviour
 
         if(contains){ //checks if the player has the item
             resourceInfo.text = resourceSelected.getInformationText();
-            resourceName.text = resourceSelected.getResourceName();
+            resourceName.text = resourceSelected.getName();
             resourceIcon.sprite = resourceSelected.getIcon();
 
             amountToDropSlider.maxValue = maxValue;
@@ -148,6 +150,12 @@ public class InventoryUIHandler : NetworkBehaviour
             }else{
                 amountToDropSlider.minValue = 0f;
                 amountToDropSlider.value = 1f;
+            }
+
+            if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.Collectible){
+                equipButton.SetActive(false);
+            }else{
+                equipButton.SetActive(true);
             }
     
             
@@ -222,6 +230,12 @@ public class InventoryUIHandler : NetworkBehaviour
         player.GetComponent<ResourceInventory>().dropButtonPressed();
     }
 
+    public void equipButtonPressed(){
+        if(!IsOwner) return;
+
+        player.GetComponent<ResourceInventory>().equipButtonPressed();
+    }
+
     // Function to start the shake animation for the slot
     public void StartShaking()
     {
@@ -251,16 +265,19 @@ public class InventoryUIHandler : NetworkBehaviour
         // Shake animation loops
         while (inventoryUI.activeSelf)
         {
+
            // Calculate a random offset for the shake
             Vector3 randomOffset = new Vector3(Random.Range(-intensity, intensity), Random.Range(-intensity, intensity), 0f);
 
-            // Apply the offset to the slot's position
-            rectTransform.anchoredPosition = originalPosition + randomOffset;
-
+            if(rectTransform){
+                // Apply the offset to the slot's position
+                rectTransform.anchoredPosition = originalPosition + randomOffset;
+            }else{
+                 StopCoroutine(shakeCoroutine);
+            }
             // Wait for the end of the frame
             yield return null;
         }
-
         // Reset the slot's position to its original position
         rectTransform.anchoredPosition = originalPosition;
     }

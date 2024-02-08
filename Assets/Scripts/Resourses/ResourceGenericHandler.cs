@@ -6,7 +6,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Resource", menuName = "New Resource")]
 public class ResourceGenericHandler : ScriptableObject
 {
-    [SerializeField] private string resourceName;
+
+    [SerializeField] private ResourceEnum.ResourceType resourceType;
+    [SerializeField] private string Name;
     [SerializeField] private Sprite icon;
     [SerializeField] private int id;
     [SerializeField] private GameObject dropGameObject;
@@ -14,12 +16,18 @@ public class ResourceGenericHandler : ScriptableObject
     [SerializeField] private int weight;
     [SerializeField] private string informationText;
 
+    [Header("Only for EQUIPMENTS!")]
+    
+    [SerializeField] private double damage;
+    [SerializeField] private float debounceTime;
+    
+
     public int getId(){
         return id;
     }
 
-    public string getResourceName(){
-        return resourceName;
+    public string getName(){
+        return Name;
     }
 
     public Sprite getIcon(){
@@ -36,5 +44,17 @@ public class ResourceGenericHandler : ScriptableObject
 
     public int getWeight(){
         return weight;
+    }
+
+    public double getDamage(){
+        return damage;
+    }
+
+    public float getDebounceTime(){
+        return debounceTime;
+    }
+
+   public ResourceEnum.ResourceType getResourceType(){
+        return resourceType;
     }
 } 

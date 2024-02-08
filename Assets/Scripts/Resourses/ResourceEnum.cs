@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ToolEnum : MonoBehaviour
+public class ResourceEnum : MonoBehaviour
 {
-    public enum ToolType{
+    public enum ResourceType{
+        Collectible,
         Axe,
         PickAxe,
         Weapon

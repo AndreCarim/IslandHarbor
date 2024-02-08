@@ -16,7 +16,7 @@ public class ResourceHandler : NetworkBehaviour
     [SerializeField] private int amountDropFrom = 1;
     [SerializeField] private int amountDropTo = 1;   
 
-    [SerializeField] private ToolEnum.ToolType toolType;
+    [SerializeField] private ResourceEnum.ResourceType toolType;
 
 
     
@@ -40,7 +40,7 @@ public class ResourceHandler : NetworkBehaviour
     }
 
 
-    public void giveDamage(double damageAmount, ToolEnum.ToolType toolTypeUsed)
+    public void giveDamage(double damageAmount, ResourceEnum.ResourceType toolTypeUsed)
     {      
         if (currentHealth.Value >= 0)
         {
@@ -127,8 +127,15 @@ public class ResourceHandler : NetworkBehaviour
         // Get the NetworkObject component of the instantiated item
         NetworkObject objectInNetwork = droppedItem.GetComponent<NetworkObject>();
 
+        //add a droppedResource to the server copy and call the onnetworkspawn so it can get destroyed.
+        DroppedResource droppedResourceComponentServer = addResourceComponent(objectInNetwork);
+
+        droppedResourceComponentServer.OnNetworkSpawn();
+
         // Spawn the item across the network
         objectInNetwork.GetComponent<NetworkObject>().Spawn();
+
+        
 
         // Call the client RPC to synchronize resource information
         setResourceInfoClientRpc(droppedItem.GetComponent<NetworkObject>().NetworkObjectId, randomAmount);
@@ -142,18 +149,26 @@ public class ResourceHandler : NetworkBehaviour
 
         // Check if the object exists
         if (networkObject){
-            // Add or get the DroppedResource component of the object
-            DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
-            if (droppedResourceComponent == null) {
-                droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
-            }
+            DroppedResource droppedResourceComponent = addResourceComponent(networkObject);
 
+            
             // Set the resource information
             droppedResourceComponent.setResource(randomAmount, resourceDrop);
 
             // Notify the DroppedResource component that it has been spawned over the network
             droppedResourceComponent.OnNetworkSpawn();
         }
+    }
+
+
+    private DroppedResource addResourceComponent(NetworkObject networkObject){
+         // Add or get the DroppedResource component of the object
+        DroppedResource droppedResourceComponent = networkObject.GetComponent<DroppedResource>();
+        if (droppedResourceComponent == null) {
+            droppedResourceComponent = networkObject.gameObject.AddComponent<DroppedResource>();
+        }
+
+        return droppedResourceComponent;
     }
 
     private Vector3 CalculateGameObjectCenter()
@@ -225,7 +240,7 @@ public class ResourceHandler : NetworkBehaviour
     }
 
     public string getName(){
-        return resourceDrop.getResourceName();
+        return resourceDrop.getName();
     }
 
     

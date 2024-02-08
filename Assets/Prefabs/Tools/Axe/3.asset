@@ -9,9 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b7bc2b7d9ece4538a5e76d97585c431, type: 3}
-  m_Name: 001
+  m_Script: {fileID: 11500000, guid: 51216d91b8dd441b480c96b298912413, type: 3}
+  m_Name: 3
   m_EditorClassIdentifier: 
-  toolType: 0
-  damage: 20
-  debounceTime: 3
+  resourceType: 1
+  Name: first AXe
+  icon: {fileID: 0}
+  id: 3
+  dropGameObject: {fileID: 0}
+  weight: 5
+  informationText: asdwasdaw
+  damage: 10
+  debounceTime: 2

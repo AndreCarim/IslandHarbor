@@ -10,7 +10,6 @@ public class SetOnStart : NetworkBehaviour
     private ToolHandler toolHandlerScript;
     private ResourceInventory resourceInventoryScript;
     private RayCastingHandler rayCastingHandlerScript;
-    private FirstPersonCameraHandler firstPersonCamerHandlerScript;
 
     [SerializeField] private GameObject entirePlayerUI;
 
@@ -29,13 +28,6 @@ public class SetOnStart : NetworkBehaviour
 
     public override void OnNetworkSpawn(){
         base.OnNetworkSpawn();
-        initialize();
-    }
-
-    // Start is called before the first frame update
-    
-    void Start()
-    {
         if(!IsOwner){return;}
         
         toolHandlerScript = gameObject.GetComponent<ToolHandler>();
@@ -44,11 +36,11 @@ public class SetOnStart : NetworkBehaviour
         // Get the RayCastingHandler component from children
         rayCastingHandlerScript = gameObject.GetComponentInChildren<RayCastingHandler>();
 
-        // Get the FirstPersonCameraHandler component from children
-        firstPersonCamerHandlerScript = gameObject.GetComponentInChildren<FirstPersonCameraHandler>();
-
         setOnStart();
+
+        initialize();
     }
+
 
     private void setOnStart(){
 
@@ -57,7 +49,6 @@ public class SetOnStart : NetworkBehaviour
         toolHandlerScript.setOnStart(entirePlayerUI);
         resourceInventoryScript.setOnStart(entirePlayerUI);
         rayCastingHandlerScript.setOnStart(entirePlayerUI);
-        firstPersonCamerHandlerScript.setOnStart(entirePlayerUI);
     }
 
    

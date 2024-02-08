@@ -9,16 +9,18 @@ using Unity.Netcode;
 //it also sets which kind of tools there are.
 public class ToolHandler : NetworkBehaviour
 {
-    private ToolGenericHandler currentTool;
+    private ResourceGenericHandler currentEquipment;
     private ToolUIHandler toolUIHandler; // calls functions from the tooluihandler inside the ui
 
-    [SerializeField] private ToolGenericHandler currentAxe;
-    [SerializeField] private ToolGenericHandler currentPickAxe;
-    [SerializeField] private ToolGenericHandler currentWeapon;
+    [SerializeField] private ResourceGenericHandler currentAxe;
+    [SerializeField] private ResourceGenericHandler currentPickAxe;
+    [SerializeField] private ResourceGenericHandler currentWeapon;
+
+
 
 
     public override void OnNetworkSpawn(){
-        currentTool = currentAxe;
+        currentEquipment = currentAxe;
         
     }
 
@@ -31,8 +33,8 @@ public class ToolHandler : NetworkBehaviour
         // Check if the player pressed the 1 key
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if(currentTool != currentAxe){
-                currentTool = currentAxe;
+            if(currentEquipment != currentAxe){
+                currentEquipment = currentAxe;
                 toolUIHandler.setIsOn(0);
             }
         }
@@ -40,8 +42,8 @@ public class ToolHandler : NetworkBehaviour
         // Check if the player pressed the 2 key
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if(currentTool != currentPickAxe){
-                currentTool = currentPickAxe;
+            if(currentEquipment != currentPickAxe){
+                currentEquipment = currentPickAxe;
                 toolUIHandler.setIsOn(1);
             }
             // Call a function or perform an action related to key 2
@@ -50,28 +52,60 @@ public class ToolHandler : NetworkBehaviour
         // Check if the player pressed the 3 key
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if(currentTool != currentWeapon){
-                currentTool = currentWeapon;
+            if(currentEquipment != currentWeapon){
+                currentEquipment = currentWeapon;
                 toolUIHandler.setIsOn(2);
             }
             // Call a function or perform an action related to key 3
         }
     }
 
-    public ToolGenericHandler getCurrentTool(){
-        return currentTool;
+   
+
+    public ResourceGenericHandler getCurrentEquipment(){
+        return currentEquipment;
     }
 
-    public ToolGenericHandler getCurrentAxe(){
+    public ResourceGenericHandler getCurrentAxe(){
         return currentAxe;
     }
 
-    public ToolGenericHandler getCurrentPickAxe(){
-        return currentAxe;
+    public ResourceGenericHandler getCurrentPickAxe(){
+        return currentPickAxe;
     }
     
-    public ToolGenericHandler getCurrentWeapon(){
-        return currentAxe;
+    public ResourceGenericHandler getCurrentWeapon(){
+        return currentWeapon;
+    }
+
+    public void setCurrentAxe(ResourceGenericHandler equipment){
+        if(!IsOwner) return;
+
+        if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
+            //player is trying to equip the right equipment
+            Debug.Log("Axe Equipped");
+        }
+    }
+
+    public void setCurrentPickAxe(ResourceGenericHandler equipment){
+        if(!IsOwner) return;
+
+        if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
+            //player is trying to equip the right equipment
+            Debug.Log("PickAxe Equipped");
+        }
+    }
+
+    public void setCurrentWeapon(ResourceGenericHandler equipment){
+        if(!IsOwner) return;
+
+        if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
+            //player is trying to equip the right equipment
+            currentWeapon = equipment;
+
+            currentEquipment = currentWeapon;
+            toolUIHandler.setIsOn(2);
+        }
     }
 
     public void setOnStart( GameObject entirePlayerUIInstance){
