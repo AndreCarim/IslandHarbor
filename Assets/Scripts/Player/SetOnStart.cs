@@ -28,6 +28,8 @@ public class SetOnStart : NetworkBehaviour
 
     public override void OnNetworkSpawn(){
         base.OnNetworkSpawn();
+        initialize();
+
         if(!IsOwner){return;}
         
         toolHandlerScript = gameObject.GetComponent<ToolHandler>();
@@ -37,8 +39,6 @@ public class SetOnStart : NetworkBehaviour
         rayCastingHandlerScript = gameObject.GetComponentInChildren<RayCastingHandler>();
 
         setOnStart();
-
-        initialize();
     }
 
 

@@ -189,6 +189,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Glide",
+            "id": "5d1b5a2c-2206-4efb-ba40-0c11361f7e16",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "cc6c7406-b134-4031-8823-b2465ff5bffc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "39028e22-4fff-4fc3-ad20-00034d71b387",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

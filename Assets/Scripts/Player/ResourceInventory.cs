@@ -47,19 +47,22 @@ public class ResourceInventory : NetworkBehaviour
         {
             // Toggle the visibility of the inventory UI panel
             bool isOpen = inventoryUIHandlerScript.checkActiveInventory();
-            inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
+            inventoryUIHandlerScript.setWeight(currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped(), currentMaxCarryWeight);
 
              // Call different functions based on the inventory state
             if (isOpen)
             {
+                //oppening the inventory
                 cameraScript.setIsFreeToLook(false); //lock the mouse
                 movementScript.setCanWalk(false); // lock walking
                 clickScript.setInventoryIsOpen(true); // lock clicking
-                inventoryUIHandlerScript.setUIInfo(false);
+                inventoryUIHandlerScript.setUIInfo(false); // closing the uiInfo
+                inventoryUIHandlerScript.setStatsUI(false); // closing the uiStats
                 slot = null;
             }
             else
             {
+                //closing the inventory
                 cameraScript.setIsFreeToLook(true); // unlock the mouse
                 movementScript.setCanWalk(true); // unlock the walk
                 clickScript.setInventoryIsOpen(false); // unlock clicking
@@ -72,7 +75,7 @@ public class ResourceInventory : NetworkBehaviour
     public void AddResource(ResourceGenericHandler resource, int amount, GameObject collectibleResource = null)
     {
           // Check if the client is the owner of the object
-        if (!IsOwner)
+        if (!IsOwner || !resource)
             return; // Exit the method if not the owner
 
         // Check if the resource ID already exists in the dictionary
@@ -82,7 +85,7 @@ public class ResourceInventory : NetworkBehaviour
             int weightToAdd = resource.getWeight() * amount;
 
             // Check if the player has enough space to carry all the items
-            int remainingWeightCapacity = currentMaxCarryWeight - currentCarryWeight;
+            int remainingWeightCapacity = currentMaxCarryWeight - (currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped());
             if (weightToAdd <= remainingWeightCapacity)
             {
                 // The player has space to carry all the items
@@ -116,7 +119,7 @@ public class ResourceInventory : NetworkBehaviour
             int weightToAdd = resource.getWeight() * amount;
 
             // Check if the player has enough space to carry all the items
-            int remainingWeightCapacity = currentMaxCarryWeight - currentCarryWeight;
+            int remainingWeightCapacity =  currentMaxCarryWeight - (currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped());
             if (weightToAdd <= remainingWeightCapacity)
             {
                 // The player has space to carry all the items
@@ -183,23 +186,42 @@ public class ResourceInventory : NetworkBehaviour
         // Check if the resource ID exists in the dictionary
         if (resourceCountDictionary.ContainsKey(resource.getId()))
         {
+
             // Decrement the resource count
             resourceCountDictionary[resource.getId()] -= amount;
 
             // If count goes <= 0, remove it from the dictionary and UI
             if (resourceCountDictionary[resource.getId()] <= 0)
             {
+
                 resourceCountDictionary.Remove(resource.getId());
 
-                // Remove UI for the resource
-                inventoryUIHandlerScript.RemoveResourceUI(resource.getId());
+                //now checking if i am trying to remove a resource that is in the inventory or in the equipment equipped
+                if(!slot.CompareTag("EquipmentIcon")){
 
+                    // Remove UI for the resource
+                    inventoryUIHandlerScript.RemoveResourceUI(resource.getId());     
+                }else if(slot.CompareTag("EquipmentIcon")){
+
+                    //trying to drop a item from the equipedEquipment
+                    gameObject.GetComponent<ToolHandler>().removeEquippedEquipmentByDropOrUnequip(resource);
+                }
                 inventoryUIHandlerScript.setUIInfo(false);
+                inventoryUIHandlerScript.setStatsUI(false);       
             }
             else
             {
+
+                if(slot.CompareTag("EquipmentIcon")){
+                    //if the player dropped the item from the equipped area 
+                    //but the player still have more, it will remove the equipped item
+                    gameObject.GetComponent<ToolHandler>().removeEquippedEquipmentByDropOrUnequip(resource);    
+
+                }
+
                 // Update UI for the resource
                 inventoryUIHandlerScript.CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
+ 
 
                 inventoryUIHandlerScript.StartShaking();
             }
@@ -208,15 +230,23 @@ public class ResourceInventory : NetworkBehaviour
         }
     }
 
-    public void slotSelected(ResourceGenericHandler resourceSelected, GameObject slot){
+    public void slotSelected(ResourceGenericHandler resourceSelected, GameObject slot, bool isEquipped = false){
     // Check if the selected slot is different from the current one
         if (this.slot != slot)
         {
             this.resourceSelected = resourceSelected;
             this.slot = slot;
 
-            inventoryUIHandlerScript.setResourceSelected(resourceSelected, slot, resourceCountDictionary[resourceSelected.getId()]);
-        }
+            if(resourceCountDictionary.ContainsKey(resourceSelected.getId()) && !slot.CompareTag("EquipmentIcon")){
+                inventoryUIHandlerScript.setResourceSelected(resourceSelected, slot, resourceCountDictionary[resourceSelected.getId()], isEquipped);
+            }else{
+                //if there is no resource in the inventory, it means its the equipped and there is no resource in the invetory
+                //so the player has only one
+ 
+                inventoryUIHandlerScript.setResourceSelected(resourceSelected, slot, 1, isEquipped);
+            }
+
+       }
     }
 
     //this is being called by the button component on the dropButton isnde the inventory UI
@@ -227,8 +257,8 @@ public class ResourceInventory : NetworkBehaviour
             return; // Exit the method if not the owner
 
         // Check if the resource is in the inventory
-        if (resourceCountDictionary.ContainsKey(resourceSelected.getId()))
-        {
+        if (!slot.CompareTag("EquipmentIcon") && resourceCountDictionary.ContainsKey(resourceSelected.getId()))
+        {//making sure we have in the inventory and its not an equipment
             
             // Get the amount of the selected resource
             int amountPlayerHas = resourceCountDictionary.ContainsKey(resourceSelected.getId()) ? resourceCountDictionary[resourceSelected.getId()] : 0;
@@ -242,12 +272,23 @@ public class ResourceInventory : NetworkBehaviour
                 RemoveResource(resourceSelected, amountToDrop); //from the inventory ui  
                 dropItemInFrontOfThePlayer(amountToDrop, resourceSelected, false, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());   
                 
-                inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
+                inventoryUIHandlerScript.setWeight(currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped(), currentMaxCarryWeight);
             }
         }
-        else
+        else if(slot.CompareTag("EquipmentIcon"))
         {
-            // If the resource is not in the inventory, do nothing. THIS SHOULD NOT HAPPEN!
+            //player trying to drop a equipment from the equipped tab and it only has one
+            //remove the equipment from the toolhandler and then
+            //drop in front of the player
+            gameObject.GetComponent<ToolHandler>().removeEquippedEquipmentByDropOrUnequip(resourceSelected);
+            dropItemInFrontOfThePlayer(1, resourceSelected, false, CalculateXPositionToDrop(), CalculateYPositionToDrop(), CalculateZPositionToDrop());
+            
+            inventoryUIHandlerScript.setUIInfo(false);
+            inventoryUIHandlerScript.setStatsUI(false);
+            inventoryUIHandlerScript.setWeight(currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped(), currentMaxCarryWeight);
+            inventoryUIHandlerScript.stopCoroutine();
+        }else{
+            // If the resource is not in the inventory and not in the equipments equipped, do nothing. THIS SHOULD NOT HAPPEN!
             Debug.Log("How are you clicking on a item that you dont have? \n and why are you seeing this message???");
         }
     }
@@ -395,21 +436,63 @@ public class ResourceInventory : NetworkBehaviour
 
         if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.Axe){
             //equipping an axe
-            
-
-            gameObject.GetComponent<ToolHandler>().setCurrentAxe(resourceSelected);
+            equipButtonPressedHandler(gameObject.GetComponent<ToolHandler>().getCurrentAxe());
         }else if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.PickAxe){
             //equipping a pickAxe
-            gameObject.GetComponent<ToolHandler>().setCurrentPickAxe(resourceSelected);
+            equipButtonPressedHandler(gameObject.GetComponent<ToolHandler>().getCurrentPickAxe()); 
         }else if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.Weapon){
-            //equipping a Weapon
-            ResourceGenericHandler currentResource = gameObject.GetComponent<ToolHandler>().getCurrentWeapon();
-
-            gameObject.GetComponent<ToolHandler>().setCurrentWeapon(resourceSelected);     
-
-            RemoveResource(resourceSelected, 1);     
-            AddResource(currentResource, 1);
+            equipButtonPressedHandler(gameObject.GetComponent<ToolHandler>().getCurrentWeapon());        
         }
+    }
+
+    private void equipButtonPressedHandler(ResourceGenericHandler currentResource){
+        //if its trying to equip the same equipment, return;
+        if(currentResource == resourceSelected || !IsOwner){ return;}
+
+        
+
+        gameObject.GetComponent<ToolHandler>().setCurrenEquipment(resourceSelected);    
+
+        
+        RemoveResource(resourceSelected, 1);//remove the current one
+        AddResource(currentResource, 1);
+
+        if(currentResource){
+            // Update UI for the resource, adding the equipment to the inventory
+            //only happening if the player had a equipment already equipped. 
+            inventoryUIHandlerScript.CreateOrUpdateResourceUI(currentResource, resourceCountDictionary[currentResource.getId()]);
+        }
+
+        setSlotNull();
+
+        inventoryUIHandlerScript.setUIInfo(false);
+        inventoryUIHandlerScript.setStatsUI(false);
+        inventoryUIHandlerScript.stopCoroutine();
+    }
+
+    public void unequipButtonPressed(){
+        //addResource
+        //removeEquippedEquipmentByDropOrUnequip
+        if(resourceSelected){
+             AddResource(resourceSelected, 1);
+
+             //trying to drop a item from the equipedEquipment
+            gameObject.GetComponent<ToolHandler>().removeEquippedEquipmentByDropOrUnequip(resourceSelected);
+        }
+
+       
+        setSlotNull();
+
+        inventoryUIHandlerScript.setUIInfo(false);
+        inventoryUIHandlerScript.setStatsUI(false);
+        inventoryUIHandlerScript.stopCoroutine();
+    }
+
+    private void setSlotNull(){
+        slot = null;
+        resourceSelected = null;
+
+        inventoryUIHandlerScript.setSlotNull();
     }
 
     private float CalculateXPositionToDrop()
@@ -465,7 +548,9 @@ public class ResourceInventory : NetworkBehaviour
         
         inventoryUIHandlerScript = entirePlayerUIInstance.GetComponent<InventoryUIHandler>();
 
-        inventoryUIHandlerScript.setWeight(currentCarryWeight, currentMaxCarryWeight);
+        inventoryUIHandlerScript.setWeight(currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped(), currentMaxCarryWeight);
         inventoryUIHandlerScript.setPlayer(gameObject);
     }
+
+   
 }

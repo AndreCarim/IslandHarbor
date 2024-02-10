@@ -211,6 +211,34 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Glide"",
+            ""id"": ""5d1b5a2c-2206-4efb-ba40-0c11361f7e16"",
+            ""actions"": [
+                {
+                    ""name"": ""New action"",
+                    ""type"": ""Button"",
+                    ""id"": ""cc6c7406-b134-4031-8823-b2465ff5bffc"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""39028e22-4fff-4fc3-ad20-00034d71b387"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""New action"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -220,6 +248,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_OnFoot_Movement = m_OnFoot.FindAction("Movement", throwIfNotFound: true);
         m_OnFoot_Jump = m_OnFoot.FindAction("Jump", throwIfNotFound: true);
         m_OnFoot_Look = m_OnFoot.FindAction("Look", throwIfNotFound: true);
+        // Glide
+        m_Glide = asset.FindActionMap("Glide", throwIfNotFound: true);
+        m_Glide_Newaction = m_Glide.FindAction("New action", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -339,10 +370,60 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         }
     }
     public OnFootActions @OnFoot => new OnFootActions(this);
+
+    // Glide
+    private readonly InputActionMap m_Glide;
+    private List<IGlideActions> m_GlideActionsCallbackInterfaces = new List<IGlideActions>();
+    private readonly InputAction m_Glide_Newaction;
+    public struct GlideActions
+    {
+        private @PlayerInput m_Wrapper;
+        public GlideActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Newaction => m_Wrapper.m_Glide_Newaction;
+        public InputActionMap Get() { return m_Wrapper.m_Glide; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(GlideActions set) { return set.Get(); }
+        public void AddCallbacks(IGlideActions instance)
+        {
+            if (instance == null || m_Wrapper.m_GlideActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_GlideActionsCallbackInterfaces.Add(instance);
+            @Newaction.started += instance.OnNewaction;
+            @Newaction.performed += instance.OnNewaction;
+            @Newaction.canceled += instance.OnNewaction;
+        }
+
+        private void UnregisterCallbacks(IGlideActions instance)
+        {
+            @Newaction.started -= instance.OnNewaction;
+            @Newaction.performed -= instance.OnNewaction;
+            @Newaction.canceled -= instance.OnNewaction;
+        }
+
+        public void RemoveCallbacks(IGlideActions instance)
+        {
+            if (m_Wrapper.m_GlideActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IGlideActions instance)
+        {
+            foreach (var item in m_Wrapper.m_GlideActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_GlideActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public GlideActions @Glide => new GlideActions(this);
     public interface IOnFootActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+    }
+    public interface IGlideActions
+    {
+        void OnNewaction(InputAction.CallbackContext context);
     }
 }

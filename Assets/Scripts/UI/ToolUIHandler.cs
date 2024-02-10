@@ -10,6 +10,14 @@ public class ToolUIHandler : NetworkBehaviour
     [SerializeField] private Image axeIsOn;
     [SerializeField] private Image weaponIsOn;
 
+    private ResourceGenericHandler currentAxe;
+    private ResourceGenericHandler currentPickAxe;
+    private ResourceGenericHandler currentWeapon;
+
+    [SerializeField] private Image axeIcon;
+    [SerializeField] private Image pickAxeIcon;
+    [SerializeField] private Image weaponIcon;
+
     public void setIsOn(int WhichUI)
     {
         if(!IsOwner){return;}
@@ -29,4 +37,49 @@ public class ToolUIHandler : NetworkBehaviour
             weaponIsOn.color = new Color(weaponIsOn.color.r, weaponIsOn.color.g, weaponIsOn.color.b, 1f);
         }       
     }
+
+    public void equipEquipment(ResourceGenericHandler equipment){
+        if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
+            currentAxe = equipment;
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
+            currentPickAxe = equipment;
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
+            currentWeapon = equipment;
+        }
+
+        setUiImages();   
+    }
+
+
+    public void removeEquippedEquipmentByDropOrUnequip(ResourceGenericHandler equipment){
+        if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
+            currentAxe = null;
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
+            currentPickAxe = null;
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
+            currentWeapon = null;    
+        }
+        setUiImages();
+    }
+
+    private void setUiImages(){
+        if(currentAxe){
+            axeIcon.sprite = currentAxe.getIcon();
+        }else{
+            axeIcon.sprite = null;
+        }
+
+        if(currentPickAxe){
+            pickAxeIcon.sprite = currentPickAxe.getIcon();
+        }else{
+            pickAxeIcon.sprite = null;
+        }
+
+        if(currentWeapon){
+            weaponIcon.sprite = currentWeapon.getIcon();
+        }else{
+            weaponIcon.sprite = null;
+        }
+    }
+
 }

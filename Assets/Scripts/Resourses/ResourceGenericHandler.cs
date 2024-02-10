@@ -12,6 +12,7 @@ public class ResourceGenericHandler : ScriptableObject
     [SerializeField] private Sprite icon;
     [SerializeField] private int id;
     [SerializeField] private GameObject dropGameObject;
+    [SerializeField] private int goldValue;
 
     [SerializeField] private int weight;
     [SerializeField] private string informationText;
@@ -56,5 +57,9 @@ public class ResourceGenericHandler : ScriptableObject
 
    public ResourceEnum.ResourceType getResourceType(){
         return resourceType;
+    }
+
+    public int getGoldValue(){
+        return goldValue;
     }
 } 

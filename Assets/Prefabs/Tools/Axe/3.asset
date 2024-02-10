@@ -17,7 +17,8 @@ MonoBehaviour:
   icon: {fileID: 0}
   id: 3
   dropGameObject: {fileID: 0}
+  goldValue: 10
   weight: 5
   informationText: asdwasdaw
-  damage: 10
-  debounceTime: 2
+  damage: 50
+  debounceTime: 0.1

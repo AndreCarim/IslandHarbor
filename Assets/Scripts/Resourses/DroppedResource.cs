@@ -8,11 +8,14 @@ public class DroppedResource : NetworkBehaviour
     private int amount;
     private ResourceGenericHandler resource;
 
+    private float minDestroyTime = 120f;
+    private float maxDestroyTime = 130f;
+
     public override void OnNetworkSpawn()
     {   
         if(IsServer) {
             // Generate a random time interval for destruction
-            float destroyTime = 10f;
+            float destroyTime = Random.Range(minDestroyTime, maxDestroyTime);
 
             // Destroy the GameObject after the random time interval
             Destroy(gameObject, destroyTime);

@@ -17,6 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: c3d1759165899884db3e3e9af9454669, type: 3}
   id: 5
   dropGameObject: {fileID: 1819027836624584374, guid: 686506779476a44f2b8268d2952994c5, type: 3}
+  goldValue: 10
   weight: 10
   informationText: awdawdaw
   damage: 50

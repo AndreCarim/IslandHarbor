@@ -17,6 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 2d9bcb349a0be0a49aea518a9b3c3726, type: 3}
   id: 6
   dropGameObject: {fileID: 4872178930830419935, guid: e5518f69ae5c14d3b9cbde37e442f840, type: 3}
+  goldValue: 17
   weight: 10
   informationText: 'fasdaw daw daw '
   damage: 20

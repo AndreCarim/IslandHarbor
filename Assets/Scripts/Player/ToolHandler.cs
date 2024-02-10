@@ -17,6 +17,8 @@ public class ToolHandler : NetworkBehaviour
     [SerializeField] private ResourceGenericHandler currentWeapon;
 
 
+    private int currentWeightEquipped;
+
 
 
     public override void OnNetworkSpawn(){
@@ -78,32 +80,48 @@ public class ToolHandler : NetworkBehaviour
         return currentWeapon;
     }
 
-    public void setCurrentAxe(ResourceGenericHandler equipment){
+    public int getCurrentWeightEquipped(){
+        return currentWeightEquipped;
+    }
+
+
+    public void setCurrenEquipment(ResourceGenericHandler equipment){
         if(!IsOwner) return;
 
         if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
-            //player is trying to equip the right equipment
-            Debug.Log("Axe Equipped");
-        }
-    }
-
-    public void setCurrentPickAxe(ResourceGenericHandler equipment){
-        if(!IsOwner) return;
-
-        if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
-            //player is trying to equip the right equipment
-            Debug.Log("PickAxe Equipped");
-        }
-    }
-
-    public void setCurrentWeapon(ResourceGenericHandler equipment){
-        if(!IsOwner) return;
-
-        if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
-            //player is trying to equip the right equipment
+            //player is trying to equip the right axe
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
+            //player is trying to equip the right pickaxe
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
+            if(currentWeapon){
+                removeEquippedEquipmentByDropOrUnequip(equipment);
+            }
+            
             currentWeapon = equipment;
 
             currentEquipment = currentWeapon;
+            currentWeightEquipped += currentWeapon.getWeight();
+            toolUIHandler.equipEquipment(equipment);
+            toolUIHandler.setIsOn(2);
+        }
+    }
+
+    public void removeEquippedEquipmentByDropOrUnequip(ResourceGenericHandler equipment){
+        if(!IsOwner) return;
+
+        if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
+            //player is trying to remove the right axe
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
+            //player is trying to remove the right pickaxe
+        }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
+            //player is trying to remove the right weapon
+            if(currentWeapon){
+                currentWeightEquipped -= currentWeapon.getWeight();
+            }
+            currentWeapon = null;
+
+            currentEquipment = currentWeapon;
+            toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
             toolUIHandler.setIsOn(2);
         }
     }
@@ -112,4 +130,5 @@ public class ToolHandler : NetworkBehaviour
         toolUIHandler = entirePlayerUIInstance.GetComponent<ToolUIHandler>();
         toolUIHandler.setIsOn(0);
     }
+
 }

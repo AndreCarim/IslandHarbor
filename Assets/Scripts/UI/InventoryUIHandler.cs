@@ -29,7 +29,16 @@ public class InventoryUIHandler : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI currentMaxCarryWeightText;
     [SerializeField] private TextMeshProUGUI currentCarryWeightText;
 
+    [SerializeField] private TextMeshProUGUI damageValueText;
+    [SerializeField] private TextMeshProUGUI debounceValueText;
+    [SerializeField] private GameObject statsTabUI;
+
     [SerializeField] private GameObject equipButton;
+    [SerializeField] private GameObject unequipButton;
+
+    [SerializeField] private GameObject axeEquippedSlot;
+    [SerializeField] private GameObject pickAxeEquippedSlot;
+    [SerializeField] private GameObject weaponEquippedSlot;
 
     private GameObject player;
 
@@ -44,21 +53,33 @@ public class InventoryUIHandler : NetworkBehaviour
      // Store the Coroutine reference for the shaking animation
     private Coroutine shakeCoroutine;
 
-    public bool checkActiveInventory(){
-    if(!IsOwner){return false;}
+    // Method to check if the player's inventory is currently active
+    public bool checkActiveInventory()
+    {
+        // Check if the current client is the owner of the player object
+        if (!IsOwner)
+        {
+            // If not the owner, return false indicating the inventory is not active
+            return false;
+        }
 
-        if(inventoryUI.activeSelf){
+        // If the inventory is currently active, reset the selected resource and slot
+        //and close everything
+        if (inventoryUI.activeSelf)
+        {
             resourceSelected = null;
             slot = null;
         }
 
-       bool isOpen = !inventoryUI.activeSelf;
-       inventoryUI.SetActive(isOpen);
+        // Determine whether the inventory is open or closed
+        bool isOpen = !inventoryUI.activeSelf;
 
-       
+        // Set the inventory UI active state based on whether it's open or closed
+        inventoryUI.SetActive(isOpen);
 
-       return isOpen;
-    }    
+        // Return the status of the inventory (open or closed)
+        return isOpen;
+    }   
 
     public void setweightText(){
         if(!IsOwner){return;}
@@ -134,7 +155,7 @@ public class InventoryUIHandler : NetworkBehaviour
         }
     }
 
-    public void setItemInformation(ResourceGenericHandler resourceSelected, bool contains, int maxValue = 0){
+    public void setItemInformation(ResourceGenericHandler resourceSelected, bool contains, int maxValue = 0, bool isEquipped = false){
         if(!IsOwner){return;}
 
         if(contains){ //checks if the player has the item
@@ -153,9 +174,23 @@ public class InventoryUIHandler : NetworkBehaviour
             }
 
             if(resourceSelected.getResourceType() == ResourceEnum.ResourceType.Collectible){
+                //if it is a collectible
                 equipButton.SetActive(false);
+                statsTabUI.SetActive(false);
             }else{
+                //if it is a equipment
                 equipButton.SetActive(true);
+                statsTabUI.SetActive(true);
+
+                setStatsUI(resourceSelected);
+            }
+
+            //this will check if the button pressed is one of the already equipped equipments
+            if(isEquipped){
+                equipButton.SetActive(false);
+                unequipButton.SetActive(true);
+            }else{
+                unequipButton.SetActive(false);
             }
     
             
@@ -164,6 +199,11 @@ public class InventoryUIHandler : NetworkBehaviour
         }   
 
         setTextAmountDrop();
+    }
+
+    private void setStatsUI(ResourceGenericHandler equipmentSelected){
+        damageValueText.text = equipmentSelected.getDamage().ToString();
+        debounceValueText.text = equipmentSelected.getDebounceTime().ToString();
     }
 
     public void setTextAmountDrop(){
@@ -205,7 +245,13 @@ public class InventoryUIHandler : NetworkBehaviour
         resourceInforUI.SetActive(value);
     }
 
-    public void setResourceSelected(ResourceGenericHandler resourceSelected, GameObject slot, int amount){
+    public void setStatsUI(bool value){
+        if(!IsOwner)return;
+
+        statsTabUI.SetActive(value);
+    }
+
+    public void setResourceSelected(ResourceGenericHandler resourceSelected, GameObject slot, int amount, bool isEquipped = false){
         if(!IsOwner){return;}
 
          if (this.slot != slot)
@@ -217,7 +263,7 @@ public class InventoryUIHandler : NetworkBehaviour
             if (slot != null)
             {
                 StartShaking();
-                setItemInformation(resourceSelected, true, amount);
+                setItemInformation(resourceSelected, true, amount, isEquipped);
             }
 
             resourceInforUI.SetActive(true);
@@ -236,6 +282,28 @@ public class InventoryUIHandler : NetworkBehaviour
         player.GetComponent<ResourceInventory>().equipButtonPressed();
     }
 
+    public void unequipButtonPressed(){
+        player.GetComponent<ResourceInventory>().unequipButtonPressed();
+    }
+
+    public void equippedWeaponPressed(){
+        if(!player.GetComponent<ToolHandler>().getCurrentWeapon()) return;
+
+        player.GetComponent<ResourceInventory>().slotSelected(player.GetComponent<ToolHandler>().getCurrentWeapon(), weaponEquippedSlot, true);
+    }
+
+    public void equippedAxePressed(){
+        if(!player.GetComponent<ToolHandler>().getCurrentAxe()) return;
+
+        player.GetComponent<ResourceInventory>().slotSelected(player.GetComponent<ToolHandler>().getCurrentAxe(), axeEquippedSlot, true);
+    }
+
+    public void equippedPickAxePressed(){
+        if(!player.GetComponent<ToolHandler>().getCurrentPickAxe()) return;
+
+        player.GetComponent<ResourceInventory>().slotSelected(player.GetComponent<ToolHandler>().getCurrentPickAxe(), pickAxeEquippedSlot, true);
+    }
+
     // Function to start the shake animation for the slot
     public void StartShaking()
     {
@@ -249,15 +317,15 @@ public class InventoryUIHandler : NetworkBehaviour
         // Start a new coroutine for the current button
         shakeCoroutine = StartCoroutine(ShakeCoroutine());
     }
+    
 
     // Coroutine for the shake animation
     private IEnumerator ShakeCoroutine()
     {
-
         RectTransform rectTransform = slot.GetComponent<RectTransform>();
 
         // Intensity of the shake
-        float intensity = 5f;
+        float intensity = 10f;
 
         // Initial position of the slot
         Vector3 originalPosition = rectTransform.anchoredPosition;
@@ -273,7 +341,8 @@ public class InventoryUIHandler : NetworkBehaviour
                 // Apply the offset to the slot's position
                 rectTransform.anchoredPosition = originalPosition + randomOffset;
             }else{
-                 StopCoroutine(shakeCoroutine);
+                rectTransform.anchoredPosition = originalPosition;
+                StopCoroutine(shakeCoroutine);           
             }
             // Wait for the end of the frame
             yield return null;
@@ -315,6 +384,11 @@ public class InventoryUIHandler : NetworkBehaviour
         if(!IsOwner){return 0;}
 
         return (int)amountToDropSlider.value;
+    }
+
+    public void setSlotNull(){
+        slot = null;
+        resourceSelected = null;
     }
 
 

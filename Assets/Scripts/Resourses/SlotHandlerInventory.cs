@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
+//it dosent neet to be network behavior since its only showing to the client
 public class SlotHandlerInventory : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private GameObject toolTip;
