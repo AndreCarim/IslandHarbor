@@ -52,6 +52,8 @@ public class InventoryUIHandler : NetworkBehaviour
 
      // Store the Coroutine reference for the shaking animation
     private Coroutine shakeCoroutine;
+     // Initial position of the slot
+    private Vector3 originalPosition;
 
     // Method to check if the player's inventory is currently active
     public bool checkActiveInventory()
@@ -189,6 +191,12 @@ public class InventoryUIHandler : NetworkBehaviour
             if(isEquipped){
                 equipButton.SetActive(false);
                 unequipButton.SetActive(true);
+            }else if(resourceSelected == player.GetComponent<ToolHandler>().getCurrentWeapon()){
+                equipButton.SetActive(false);
+            }else if(resourceSelected == player.GetComponent<ToolHandler>().getCurrentPickAxe()){
+                equipButton.SetActive(false);
+            }else if(resourceSelected == player.GetComponent<ToolHandler>().getCurrentPickAxe()){
+                equipButton.SetActive(false);
             }else{
                 unequipButton.SetActive(false);
             }
@@ -326,9 +334,8 @@ public class InventoryUIHandler : NetworkBehaviour
 
         // Intensity of the shake
         float intensity = 10f;
-
-        // Initial position of the slot
-        Vector3 originalPosition = rectTransform.anchoredPosition;
+        originalPosition = rectTransform.anchoredPosition;
+       
 
         // Shake animation loops
         while (inventoryUI.activeSelf)
@@ -357,6 +364,8 @@ public class InventoryUIHandler : NetworkBehaviour
         if (shakeCoroutine != null){
             StopCoroutine(shakeCoroutine);
         }       
+
+        
     }
 
     public void setWeight(int currentCarryWeight, int currentMaxCarryWeight){

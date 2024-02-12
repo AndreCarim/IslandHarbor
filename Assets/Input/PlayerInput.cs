@@ -53,6 +53,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LMClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""d6cfe22b-5f1d-4043-9d9c-fac9ae7532a7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EInteraction"",
+                    ""type"": ""Button"",
+                    ""id"": ""9616da3f-2c17-4e76-a330-5813fa40c3fa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -209,11 +227,44 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ee0bd465-972f-43a8-8d43-ec4efe0aa54a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LMClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9495cf25-821e-42bf-b2e0-3d6ee13d014b"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EInteraction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""84e981e1-11a2-4f52-8aca-bfc2a2a4fe36"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EInteraction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
         {
-            ""name"": ""Glide"",
+            ""name"": ""Gliding"",
             ""id"": ""5d1b5a2c-2206-4efb-ba40-0c11361f7e16"",
             ""actions"": [
                 {
@@ -248,9 +299,11 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_OnFoot_Movement = m_OnFoot.FindAction("Movement", throwIfNotFound: true);
         m_OnFoot_Jump = m_OnFoot.FindAction("Jump", throwIfNotFound: true);
         m_OnFoot_Look = m_OnFoot.FindAction("Look", throwIfNotFound: true);
-        // Glide
-        m_Glide = asset.FindActionMap("Glide", throwIfNotFound: true);
-        m_Glide_Newaction = m_Glide.FindAction("New action", throwIfNotFound: true);
+        m_OnFoot_LMClick = m_OnFoot.FindAction("LMClick", throwIfNotFound: true);
+        m_OnFoot_EInteraction = m_OnFoot.FindAction("EInteraction", throwIfNotFound: true);
+        // Gliding
+        m_Gliding = asset.FindActionMap("Gliding", throwIfNotFound: true);
+        m_Gliding_Newaction = m_Gliding.FindAction("New action", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -315,6 +368,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_OnFoot_Movement;
     private readonly InputAction m_OnFoot_Jump;
     private readonly InputAction m_OnFoot_Look;
+    private readonly InputAction m_OnFoot_LMClick;
+    private readonly InputAction m_OnFoot_EInteraction;
     public struct OnFootActions
     {
         private @PlayerInput m_Wrapper;
@@ -322,6 +377,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_OnFoot_Movement;
         public InputAction @Jump => m_Wrapper.m_OnFoot_Jump;
         public InputAction @Look => m_Wrapper.m_OnFoot_Look;
+        public InputAction @LMClick => m_Wrapper.m_OnFoot_LMClick;
+        public InputAction @EInteraction => m_Wrapper.m_OnFoot_EInteraction;
         public InputActionMap Get() { return m_Wrapper.m_OnFoot; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -340,6 +397,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @LMClick.started += instance.OnLMClick;
+            @LMClick.performed += instance.OnLMClick;
+            @LMClick.canceled += instance.OnLMClick;
+            @EInteraction.started += instance.OnEInteraction;
+            @EInteraction.performed += instance.OnEInteraction;
+            @EInteraction.canceled += instance.OnEInteraction;
         }
 
         private void UnregisterCallbacks(IOnFootActions instance)
@@ -353,6 +416,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @LMClick.started -= instance.OnLMClick;
+            @LMClick.performed -= instance.OnLMClick;
+            @LMClick.canceled -= instance.OnLMClick;
+            @EInteraction.started -= instance.OnEInteraction;
+            @EInteraction.performed -= instance.OnEInteraction;
+            @EInteraction.canceled -= instance.OnEInteraction;
         }
 
         public void RemoveCallbacks(IOnFootActions instance)
@@ -371,58 +440,60 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     }
     public OnFootActions @OnFoot => new OnFootActions(this);
 
-    // Glide
-    private readonly InputActionMap m_Glide;
-    private List<IGlideActions> m_GlideActionsCallbackInterfaces = new List<IGlideActions>();
-    private readonly InputAction m_Glide_Newaction;
-    public struct GlideActions
+    // Gliding
+    private readonly InputActionMap m_Gliding;
+    private List<IGlidingActions> m_GlidingActionsCallbackInterfaces = new List<IGlidingActions>();
+    private readonly InputAction m_Gliding_Newaction;
+    public struct GlidingActions
     {
         private @PlayerInput m_Wrapper;
-        public GlideActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Glide_Newaction;
-        public InputActionMap Get() { return m_Wrapper.m_Glide; }
+        public GlidingActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Newaction => m_Wrapper.m_Gliding_Newaction;
+        public InputActionMap Get() { return m_Wrapper.m_Gliding; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(GlideActions set) { return set.Get(); }
-        public void AddCallbacks(IGlideActions instance)
+        public static implicit operator InputActionMap(GlidingActions set) { return set.Get(); }
+        public void AddCallbacks(IGlidingActions instance)
         {
-            if (instance == null || m_Wrapper.m_GlideActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_GlideActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_GlidingActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_GlidingActionsCallbackInterfaces.Add(instance);
             @Newaction.started += instance.OnNewaction;
             @Newaction.performed += instance.OnNewaction;
             @Newaction.canceled += instance.OnNewaction;
         }
 
-        private void UnregisterCallbacks(IGlideActions instance)
+        private void UnregisterCallbacks(IGlidingActions instance)
         {
             @Newaction.started -= instance.OnNewaction;
             @Newaction.performed -= instance.OnNewaction;
             @Newaction.canceled -= instance.OnNewaction;
         }
 
-        public void RemoveCallbacks(IGlideActions instance)
+        public void RemoveCallbacks(IGlidingActions instance)
         {
-            if (m_Wrapper.m_GlideActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_GlidingActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IGlideActions instance)
+        public void SetCallbacks(IGlidingActions instance)
         {
-            foreach (var item in m_Wrapper.m_GlideActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_GlidingActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_GlideActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_GlidingActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public GlideActions @Glide => new GlideActions(this);
+    public GlidingActions @Gliding => new GlidingActions(this);
     public interface IOnFootActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnLMClick(InputAction.CallbackContext context);
+        void OnEInteraction(InputAction.CallbackContext context);
     }
-    public interface IGlideActions
+    public interface IGlidingActions
     {
         void OnNewaction(InputAction.CallbackContext context);
     }

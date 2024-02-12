@@ -10,6 +10,9 @@ public class RayCastingHandler : NetworkBehaviour
     private CenterUIHandler centerUIHandlerScript;
     private ResourceHPBar resourceHPBarScript;
 
+    private PlayerInput playerInput;
+    private PlayerInput.OnFootActions onFoot;
+
     [SerializeField] private float maxDistanceHit = 4.5f;
     [SerializeField] private float maxDistanceGetDroppedResource = 6.5f;
     [SerializeField] private ToolHandler toolHandler;
@@ -24,8 +27,21 @@ public class RayCastingHandler : NetworkBehaviour
 
     private bool canClick = true;
     private bool inventoryIsOpen = false;
-    private bool clickedMouse = false; // Flag for left mouse button click
 
+
+    private Ray ray;
+
+
+    public override void OnNetworkSpawn(){
+        if(!IsOwner) return;
+        
+        playerInput = new PlayerInput();
+        onFoot = playerInput.OnFoot;
+
+        onFoot.LMClick.started += ctx => LMClick();
+        onFoot.EInteraction.started += ctx => EInteraction();
+        onFoot.Enable();
+    }
    
 
 
@@ -41,50 +57,87 @@ public class RayCastingHandler : NetworkBehaviour
 
         ClearTooltip(); // Clear any active tooltip
 
-        // Cast a ray from the center of the screen
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
-        bool canPerformAction = canClick && toolHandler.getCurrentEquipment() != null;
 
-        // Check if the player is holding down or has pressed the left mouse button
-        if (!inventoryIsOpen && canPerformAction && (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
-        {
-            StartCoroutine(ClickCooldown(toolHandler.getCurrentEquipment())); // Start cooldown
-            clickedMouse = true;
-        }
+        bool canPerformAction = toolHandler.getCurrentEquipment() != null && !inventoryIsOpen;
+        // Cast a ray from the center of the screen to check if its hitting something
+        ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
 
-        // Check for breakable objects
-        isBreakableChecker(ray, canPerformAction);
+         // Change Color and show hp if needed
+        isBreakableChecker(canPerformAction);
+        collectibleResourceChecker(canPerformAction);
+
+        if(onFoot.LMClick.IsPressed()){LMClick();}
+
+    }
+
+    //left mouse click
+    private void LMClick(){
+        //if the inventory is open, or if the player cant click or no equipment equipped, return
+        if(!IsOwner || inventoryIsOpen || !canClick || toolHandler.getCurrentEquipment() == null ) {return;}
+        canClick = false;
+
+        ResourceGenericHandler getCurrentEquipment = toolHandler.getCurrentEquipment();
+
+        StartCoroutine(ClickCooldown(getCurrentEquipment)); // Start cooldown
         
-        // Check for collectible resources
-        collectibleResourceChecker(ray);
+        //invoke the LMClickHandler function half the time of the debouce
+        Invoke(nameof(LMClickHandler), getCurrentEquipment.getDebounceTime() / 2); 
+        
+        //play sound
+    }
 
-        // Set clickedMouse to false when the left mouse button is released
-        if (Input.GetMouseButtonUp(0))
+    private void LMClickHandler(){
+         //this is the rayCasting that will check if at half the couroutine the player was ainming to something
+        Ray rayHit = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(rayHit, out hit, maxDistanceHit)){
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable")){
+                
+                ResourceHandler resourceHandler = hit.collider.GetComponent<ResourceHandler>();
+
+                if (resourceHandler != null){
+                    //do animation
+                    //raycast at half the animation (debounce)
+                    
+
+                    //damage is given to the isBreakable object
+                    ResourceGenericHandler currentTool = toolHandler.getCurrentEquipment();
+                    resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getResourceType());
+                    resourceHPBarScript.startCoroutines();
+                }  
+            }
+        }
+    }
+
+    private void EInteraction(){
+        //if the inventory is open, return
+        if(!IsOwner || inventoryIsOpen) {return;}
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
         {
-            clickedMouse = false;
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource")){
+                 CollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
+            }
         }
     }
 
     // Check for breakable objects
-    private void isBreakableChecker(Ray ray, bool canPerformAction)
+    private void isBreakableChecker(bool canPerformAction)
     {
+        if(!canPerformAction) return;
+
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, maxDistanceHit))
+        if (Physics.Raycast(ray, out hit, maxDistanceHit) )
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable") && !inventoryIsOpen)
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable"))
             {
                 ResourceHandler resourceHandler = hit.collider.GetComponent<ResourceHandler>();
-                if (canPerformAction && clickedMouse && hit.distance <= maxDistanceHit)
-                {                
-                    if (resourceHandler != null)
-                    {
-                        //damage is given to the isBreakable object
-                        ResourceGenericHandler currentTool = toolHandler.getCurrentEquipment();
-                        resourceHandler.giveDamage(currentTool.getDamage(), currentTool.getResourceType());
-                        resourceHPBarScript.startCoroutines();
-                    }
-                }
+                
                 resourceHPBarScript.setHpBar(resourceHandler); // Update health bar
                 centerUIHandlerScript.setCenterDotColor(isBreakableCenterColor);
             }
@@ -103,24 +156,20 @@ public class RayCastingHandler : NetworkBehaviour
     }
 
     // Check for collectible resources
-    private void collectibleResourceChecker(Ray ray)
+    private void collectibleResourceChecker(bool canPerformAction)
     {
+        if(!canPerformAction) return;
+
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource") && !inventoryIsOpen)
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource"))
             {
                 centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
 
-                if(Input.GetKeyDown(KeyCode.E))
-                {
-                    CollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
-                }
-                else
-                {
-                    DisplayTooltip(hit.collider.gameObject); // Display tooltip for collectible resource
-                }
+                DisplayTooltipResource(hit.collider.gameObject); // Display tooltip for collectible resource
+
             }
         }
     }
@@ -171,7 +220,7 @@ public class RayCastingHandler : NetworkBehaviour
     }
 
    // Display tooltip for collectible resources
-    void DisplayTooltip(GameObject resourceObject)
+    void DisplayTooltipResource(GameObject resourceObject)
     {
         DroppedResource droppedResourceScript = resourceObject.GetComponent<DroppedResource>();
 
@@ -192,7 +241,7 @@ public class RayCastingHandler : NetworkBehaviour
         // Apply the rotation, taking into account the current rotation of the tooltip
         tooltip.transform.rotation = rotationToPlayer * Quaternion.Euler(0, 180, 0); // Adjust the 180 degrees to correct the rotation
 
-        setTextTo3DToolTip(tooltip, droppedResourceScript); // Set text for the tooltip
+        setTextTo3DToolTipResource(tooltip, droppedResourceScript); // Set text for the tooltip
         // Optional: Update tooltip content (e.g., resource type, quantity, etc.)
     }
 
@@ -203,7 +252,7 @@ public class RayCastingHandler : NetworkBehaviour
     }
 
     // Set text for the 3D tooltip
-    private void setTextTo3DToolTip(GameObject toolTip, DroppedResource resource)
+    private void setTextTo3DToolTipResource(GameObject toolTip, DroppedResource resource)
     {
         TextMeshPro textMeshPro = toolTip.GetComponent<TextMeshPro>();
         if (textMeshPro)

@@ -90,8 +90,29 @@ public class ToolHandler : NetworkBehaviour
 
         if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
             //player is trying to equip the right axe
+            if(currentAxe){
+                removeEquippedEquipmentByDropOrUnequip(equipment);
+            }
+            
+            currentAxe = equipment;
+
+            currentEquipment = currentAxe;
+            currentWeightEquipped += currentAxe.getWeight();
+            toolUIHandler.equipEquipment(equipment);
+            toolUIHandler.setIsOn(0);
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
             //player is trying to equip the right pickaxe
+
+            if(currentPickAxe){
+                removeEquippedEquipmentByDropOrUnequip(equipment);
+            }
+            
+            currentPickAxe = equipment;
+
+            currentEquipment = currentPickAxe;
+            currentWeightEquipped += currentPickAxe.getWeight();
+            toolUIHandler.equipEquipment(equipment);
+            toolUIHandler.setIsOn(1);
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
             if(currentWeapon){
                 removeEquippedEquipmentByDropOrUnequip(equipment);
@@ -111,8 +132,24 @@ public class ToolHandler : NetworkBehaviour
 
         if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
             //player is trying to remove the right axe
+            if(currentAxe){
+                currentWeightEquipped -= currentAxe.getWeight();
+            }
+            currentAxe = null;
+
+            currentEquipment = currentAxe;
+            toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
+            toolUIHandler.setIsOn(0);
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
             //player is trying to remove the right pickaxe
+            if(currentPickAxe){
+                currentWeightEquipped -= currentPickAxe.getWeight();
+            }
+            currentPickAxe = null;
+
+            currentEquipment = currentPickAxe;
+            toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
+            toolUIHandler.setIsOn(1);
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
             //player is trying to remove the right weapon
             if(currentWeapon){
