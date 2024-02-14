@@ -16,14 +16,28 @@ public class ToolHandler : NetworkBehaviour
     [SerializeField] private ResourceGenericHandler currentPickAxe;
     [SerializeField] private ResourceGenericHandler currentWeapon;
 
+    [SerializeField] private GameObject toolHolder;
+
 
     private int currentWeightEquipped;
+
+    //-------------------------------------//
+    //            ANIMATIONS               //
+    //-------------------------------------//
+
+    private const string IDLE = "Idle";
+    private const string WALKING = "Walking";
+    private const string Running = "Running";
+    private const string HIT = "Hit";
+
+    [SerializeField]private Animator toolAnimator;
+
+    private string currentAnimationState;
 
 
 
     public override void OnNetworkSpawn(){
         currentEquipment = currentAxe;
-        
     }
 
     //this will handle the changing of tool pressing 1,2 and 3
@@ -85,7 +99,7 @@ public class ToolHandler : NetworkBehaviour
     }
 
 
-    public void setCurrenEquipment(ResourceGenericHandler equipment){
+    public void equipEquippment(ResourceGenericHandler equipment){
         if(!IsOwner) return;
 
         if(equipment.getResourceType() == ResourceEnum.ResourceType.Axe){
@@ -100,6 +114,8 @@ public class ToolHandler : NetworkBehaviour
             currentWeightEquipped += currentAxe.getWeight();
             toolUIHandler.equipEquipment(equipment);
             toolUIHandler.setIsOn(0);
+
+            
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
             //player is trying to equip the right pickaxe
 
@@ -124,6 +140,8 @@ public class ToolHandler : NetworkBehaviour
             currentWeightEquipped += currentWeapon.getWeight();
             toolUIHandler.equipEquipment(equipment);
             toolUIHandler.setIsOn(2);
+
+
         }
     }
 
@@ -161,6 +179,22 @@ public class ToolHandler : NetworkBehaviour
             toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
             toolUIHandler.setIsOn(2);
         }
+    }
+
+   
+
+
+    //idle, walking and running are being called by the movement script
+    //hit is being called by the raycasting script
+    //changing tool is being called by self script (this)
+    public void changeAnimationState(string newState){
+        //stop the same animation from interrupting itself
+        if (currentAnimationState == newState || !IsOwner) {return;}
+
+        //Play the animation
+        currentAnimationState = newState;
+        
+        toolAnimator.CrossFadeInFixedTime(currentAnimationState, 0.2f);
     }
 
     public void setOnStart( GameObject entirePlayerUIInstance){

@@ -18,10 +18,10 @@ public class InputMovement : NetworkBehaviour
 
     private bool canWalk = true;
 
+    private bool isAttacking = false; // this is for the animations
+
     public override void OnNetworkSpawn(){
         if(!IsOwner) return;
-
-        
 
         playerInput = new PlayerInput();
         onFoot = playerInput.OnFoot;
@@ -37,9 +37,8 @@ public class InputMovement : NetworkBehaviour
         if(!IsOwner) return;
         isGrounded = controller.isGrounded;
         ProcessMove(onFoot.Movement.ReadValue<Vector2>());
+        setAnimation();
     }
-
- 
 
     
     public void ProcessMove(Vector2 input){
@@ -60,12 +59,28 @@ public class InputMovement : NetworkBehaviour
         playerVelocity.y += gravity * Time.deltaTime;
 
         controller.Move(playerVelocity * Time.deltaTime);
+
+        if(!isAttacking){
+            if(input.x == 0 && input.y == 0){
+                gameObject.GetComponent<ToolHandler>().changeAnimationState("Idle");
+            }else{
+                gameObject.GetComponent<ToolHandler>().changeAnimationState("Walking");
+            }
+        }
     }
 
     public void Jump(){
         if(isGrounded && canWalk){
             playerVelocity.y = Mathf.Sqrt(jumpHeight * -3.0f * gravity); 
         }
+    }
+
+    private void setAnimation(){
+        
+    }
+
+    public void setIsAttacking(bool value){
+        isAttacking = value;
     }
 
     public void setCanWalk(bool value){

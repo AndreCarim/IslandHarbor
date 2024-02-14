@@ -20,8 +20,8 @@ public class ResourceGenericHandler : ScriptableObject
     [Header("Only for EQUIPMENTS!")]
     
     [SerializeField] private double damage;
-    [SerializeField] private float debounceTime;
-    
+    private float debounceTime = 1;
+  
 
     public int getId(){
         return id;

@@ -58,7 +58,7 @@ public class RayCastingHandler : NetworkBehaviour
         ClearTooltip(); // Clear any active tooltip
 
 
-        bool canPerformAction = toolHandler.getCurrentEquipment() != null && !inventoryIsOpen;
+        bool canPerformAction =  !inventoryIsOpen;
         // Cast a ray from the center of the screen to check if its hitting something
         ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
 
@@ -75,11 +75,12 @@ public class RayCastingHandler : NetworkBehaviour
         //if the inventory is open, or if the player cant click or no equipment equipped, return
         if(!IsOwner || inventoryIsOpen || !canClick || toolHandler.getCurrentEquipment() == null ) {return;}
         canClick = false;
+        gameObject.GetComponent<InputMovement>().setIsAttacking(true);
 
         ResourceGenericHandler getCurrentEquipment = toolHandler.getCurrentEquipment();
 
         StartCoroutine(ClickCooldown(getCurrentEquipment)); // Start cooldown
-        
+        toolHandler.changeAnimationState("Hit");//animate
         //invoke the LMClickHandler function half the time of the debouce
         Invoke(nameof(LMClickHandler), getCurrentEquipment.getDebounceTime() / 2); 
         
@@ -191,11 +192,12 @@ public class RayCastingHandler : NetworkBehaviour
             centerUIHandlerScript.setCooldownSlider(cooldownTime / currentTool.getDebounceTime());
             yield return null;
         }
-
+        gameObject.GetComponent<InputMovement>().setIsAttacking(false);
        centerUIHandlerScript.endCooldownSlider();
 
         // Reset the canClick flag after the cooldown
         canClick = true;
+        
     }
 
     // Block the player from clicking and getting resources while the inventory is open

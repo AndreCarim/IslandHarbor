@@ -451,7 +451,7 @@ public class ResourceInventory : NetworkBehaviour
 
         
 
-        gameObject.GetComponent<ToolHandler>().setCurrenEquipment(resourceSelected);    
+        gameObject.GetComponent<ToolHandler>().equipEquippment(resourceSelected);    
 
         
         RemoveResource(resourceSelected, 1);//remove the current one
