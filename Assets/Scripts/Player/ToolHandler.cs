@@ -18,6 +18,8 @@ public class ToolHandler : NetworkBehaviour
 
     [SerializeField] private GameObject toolHolder;
 
+    private GameObject currentTool3D;
+
 
     private int currentWeightEquipped;
 
@@ -25,10 +27,7 @@ public class ToolHandler : NetworkBehaviour
     //            ANIMATIONS               //
     //-------------------------------------//
 
-    private const string IDLE = "Idle";
-    private const string WALKING = "Walking";
-    private const string Running = "Running";
-    private const string HIT = "Hit";
+    
 
     [SerializeField]private Animator toolAnimator;
 
@@ -38,6 +37,7 @@ public class ToolHandler : NetworkBehaviour
 
     public override void OnNetworkSpawn(){
         currentEquipment = currentAxe;
+        change3DEquipment();
     }
 
     //this will handle the changing of tool pressing 1,2 and 3
@@ -53,6 +53,7 @@ public class ToolHandler : NetworkBehaviour
                 currentEquipment = currentAxe;
                 toolUIHandler.setIsOn(0);
             }
+            change3DEquipment();
         }
 
         // Check if the player pressed the 2 key
@@ -63,6 +64,7 @@ public class ToolHandler : NetworkBehaviour
                 toolUIHandler.setIsOn(1);
             }
             // Call a function or perform an action related to key 2
+            change3DEquipment();
         }
 
         // Check if the player pressed the 3 key
@@ -73,7 +75,49 @@ public class ToolHandler : NetworkBehaviour
                 toolUIHandler.setIsOn(2);
             }
             // Call a function or perform an action related to key 3
+            change3DEquipment();
         }
+    }
+
+    private void change3DEquipment()
+    {
+        if (!currentEquipment)
+        {
+                // Destroy the current tool if it exists
+            if (currentTool3D != null)
+            {
+                Destroy(currentTool3D);
+            }
+            return;
+        }
+
+        // Destroy the current tool if it exists
+        if (currentTool3D != null)
+        {
+            Destroy(currentTool3D);
+        }
+
+        // Instantiate the new tool with the toolHolder as its parent
+        currentTool3D = Instantiate(currentEquipment.getDropGameObject(), toolHolder.transform);
+
+        // Optionally, you can set the position and rotation of the new tool relative to the toolHolder
+        currentTool3D.transform.localPosition = Vector3.zero;
+        currentTool3D.transform.localRotation = Quaternion.identity;
+
+        // Check if the new instantiated object has a Rigidbody and Collider
+        Rigidbody rb = currentTool3D.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            Destroy(rb); // Destroy the Rigidbody if it exists
+        }
+
+        Collider collider = currentTool3D.GetComponent<Collider>();
+        if (collider != null)
+        {
+            Destroy(collider); // Destroy the Collider if it exists
+        }
+
+        
     }
 
    

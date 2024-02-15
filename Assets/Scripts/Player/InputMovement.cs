@@ -35,9 +35,11 @@ public class InputMovement : NetworkBehaviour
 
     void FixedUpdate(){
         if(!IsOwner) return;
+        setAnimation(onFoot.Movement.ReadValue<Vector2>());
+
         isGrounded = controller.isGrounded;
         ProcessMove(onFoot.Movement.ReadValue<Vector2>());
-        setAnimation();
+        
     }
 
     
@@ -60,13 +62,7 @@ public class InputMovement : NetworkBehaviour
 
         controller.Move(playerVelocity * Time.deltaTime);
 
-        if(!isAttacking){
-            if(input.x == 0 && input.y == 0){
-                gameObject.GetComponent<ToolHandler>().changeAnimationState("Idle");
-            }else{
-                gameObject.GetComponent<ToolHandler>().changeAnimationState("Walking");
-            }
-        }
+        
     }
 
     public void Jump(){
@@ -75,8 +71,14 @@ public class InputMovement : NetworkBehaviour
         }
     }
 
-    private void setAnimation(){
-        
+    private void setAnimation(Vector2 input){
+        if(!isAttacking){
+            if(input.x == 0 && input.y == 0){
+                gameObject.GetComponent<ToolHandler>().changeAnimationState("Idle");
+            }else{
+                gameObject.GetComponent<ToolHandler>().changeAnimationState("Walking");
+            }
+        }
     }
 
     public void setIsAttacking(bool value){
