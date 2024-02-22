@@ -116,7 +116,6 @@ public class ToolHandler : NetworkBehaviour
         {
             Destroy(collider); // Destroy the Collider if it exists
         }
-
         
     }
 
