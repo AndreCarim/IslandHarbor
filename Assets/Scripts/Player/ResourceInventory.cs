@@ -29,6 +29,8 @@ public class ResourceInventory : NetworkBehaviour
 
     private Coroutine shakeCoroutine;
 
+    private bool canOpenInventory = true;
+
     [SerializeField] private ResourceList resourceList;
 
     void Start(){
@@ -39,7 +41,7 @@ public class ResourceInventory : NetworkBehaviour
     {
 
           // Check if the client is the owner of the object
-        if (!IsOwner)
+        if (!IsOwner || !canOpenInventory)
             return; // Exit the method if not the owner
 
         // Check if the player presses the Tab or I key
@@ -55,7 +57,7 @@ public class ResourceInventory : NetworkBehaviour
                 //oppening the inventory
                 cameraScript.setIsFreeToLook(false); //lock the mouse
                 movementScript.setCanWalk(false); // lock walking
-                clickScript.setInventoryIsOpen(true); // lock clicking
+                clickScript.setIsAnyUIOpen(true); // lock clicking 
                 inventoryUIHandlerScript.setUIInfo(false); // closing the uiInfo
                 inventoryUIHandlerScript.setStatsUI(false); // closing the uiStats
                 slot = null;
@@ -65,7 +67,7 @@ public class ResourceInventory : NetworkBehaviour
                 //closing the inventory
                 cameraScript.setIsFreeToLook(true); // unlock the mouse
                 movementScript.setCanWalk(true); // unlock the walk
-                clickScript.setInventoryIsOpen(false); // unlock clicking
+                clickScript.setIsAnyUIOpen(false); // unlock clicking
                 inventoryUIHandlerScript.setToolTip(false);
             }
         }
@@ -75,7 +77,7 @@ public class ResourceInventory : NetworkBehaviour
     public void AddResource(ResourceGenericHandler resource, int amount, GameObject collectibleResource = null)
     {
           // Check if the client is the owner of the object
-        if (!IsOwner || !resource)
+        if (!IsOwner || !resource || amount == 0)
             return; // Exit the method if not the owner
 
         // Check if the resource ID already exists in the dictionary
@@ -197,11 +199,11 @@ public class ResourceInventory : NetworkBehaviour
                 resourceCountDictionary.Remove(resource.getId());
 
                 //now checking if i am trying to remove a resource that is in the inventory or in the equipment equipped
-                if(!slot.CompareTag("EquipmentIcon")){
+                if(!slot || !slot.CompareTag("EquipmentIcon")){//if there is no slot, the player is removing items from an npc
 
                     // Remove UI for the resource
                     inventoryUIHandlerScript.RemoveResourceUI(resource.getId());     
-                }else if(slot.CompareTag("EquipmentIcon")){
+                }else if(slot && slot.CompareTag("EquipmentIcon")){
 
                     //trying to drop a item from the equipedEquipment
                     gameObject.GetComponent<ToolHandler>().removeEquippedEquipmentByDropOrUnequip(resource);
@@ -212,7 +214,7 @@ public class ResourceInventory : NetworkBehaviour
             else
             {
 
-                if(slot.CompareTag("EquipmentIcon")){
+                if(slot && slot.CompareTag("EquipmentIcon")){
                     //if the player dropped the item from the equipped area 
                     //but the player still have more, it will remove the equipped item
                     gameObject.GetComponent<ToolHandler>().removeEquippedEquipmentByDropOrUnequip(resource);    
@@ -222,8 +224,10 @@ public class ResourceInventory : NetworkBehaviour
                 // Update UI for the resource
                 inventoryUIHandlerScript.CreateOrUpdateResourceUI(resource, resourceCountDictionary[resource.getId()]);
  
-
-                inventoryUIHandlerScript.StartShaking();
+                if(slot){
+                    inventoryUIHandlerScript.StartShaking();
+                }
+                
             }
 
             currentCarryWeight -= resource.getWeight() * amount;
@@ -552,5 +556,16 @@ public class ResourceInventory : NetworkBehaviour
         inventoryUIHandlerScript.setPlayer(gameObject);
     }
 
+    public int checkItemAmount(int id){
+        if(resourceCountDictionary.ContainsKey(id)){
+            return resourceCountDictionary[id];
+        }else{
+            return 0;
+        }
+    }
+
+    public void setCanOpenInventory(bool value){
+        canOpenInventory = value;
+    }
    
 }

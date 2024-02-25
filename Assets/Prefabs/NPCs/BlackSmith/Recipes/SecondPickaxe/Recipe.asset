@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Recipe
   m_EditorClassIdentifier: 
   ingredientList:
-  - {fileID: 11400000, guid: 9cefbe83dc02c4f5fae1bb7a963d9c91, type: 2}
-  - {fileID: 11400000, guid: 42824c4520cba49ccbbc3a4e7c3b6fb2, type: 2}
-  prize: {fileID: 11400000, guid: b5185ab24ee2e49499c38239b2844dcd, type: 2}
-  prizeAmount: 1
+  - {fileID: 11400000, guid: ef49f84819a6b4901ae4985003dbde2d, type: 2}
+  - {fileID: 11400000, guid: 478877905c07941038ae35ab4919e430, type: 2}
+  - {fileID: 11400000, guid: 85b577c6c6686456ab927485e4bca86e, type: 2}
+  prize: {fileID: 11400000, guid: 8b914670db7a54296b373623d3b80f7a, type: 2}
+  prizeAmount: 100

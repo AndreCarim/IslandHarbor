@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Gold
   m_EditorClassIdentifier: 
   resource: {fileID: 11400000, guid: 8b914670db7a54296b373623d3b80f7a, type: 2}
-  amount: 2
+  amount: 0

@@ -9,6 +9,7 @@ public class RayCastingHandler : NetworkBehaviour
 {
     private CenterUIHandler centerUIHandlerScript;
     private ResourceHPBar resourceHPBarScript;
+    private NPCUIHandler npcUiHandler;
 
     private PlayerInput playerInput;
     private PlayerInput.OnFootActions onFoot;
@@ -20,13 +21,15 @@ public class RayCastingHandler : NetworkBehaviour
 
     [SerializeField] private Color isBreakableCenterColor = new Color(0.9529f, 0.6f, 0.6f); // Assigning a light red color
     [SerializeField] private Color CollectibleResourceCenterColor = new Color(0.6039f, 0.9804f, 0.6745f); // Assigning a color close to #9FFAAC
-
+    [SerializeField] private Color interactableColor = new Color(1f, .9f, .1f);
 
     private GameObject activeTooltip;
     [SerializeField] private GameObject tooltipPrefab; // Prefab for the tooltip UI
 
     private bool canClick = true;
-    private bool inventoryIsOpen = false;
+    private bool isAnyUIOpen = false;
+
+    
 
 
     private Ray ray;
@@ -58,13 +61,14 @@ public class RayCastingHandler : NetworkBehaviour
         ClearTooltip(); // Clear any active tooltip
 
 
-        bool canPerformAction =  !inventoryIsOpen;
+        bool canPerformAction =  !isAnyUIOpen;
         // Cast a ray from the center of the screen to check if its hitting something
         ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
 
          // Change Color and show hp if needed
         isBreakableChecker(canPerformAction);
         collectibleResourceChecker(canPerformAction);
+        isInteractable(canPerformAction);
 
         if(onFoot.LMClick.IsPressed()){LMClick();}
 
@@ -73,7 +77,7 @@ public class RayCastingHandler : NetworkBehaviour
     //left mouse click
     private void LMClick(){
         //if the inventory is open, or if the player cant click or no equipment equipped, return
-        if(!IsOwner || inventoryIsOpen || !canClick || toolHandler.getCurrentEquipment() == null ) {return;}
+        if(!IsOwner || isAnyUIOpen || !canClick || toolHandler.getCurrentEquipment() == null ) {return;}
         canClick = false;
         gameObject.GetComponent<InputMovement>().setIsAttacking(true);
 
@@ -114,14 +118,22 @@ public class RayCastingHandler : NetworkBehaviour
 
     private void EInteraction(){
         //if the inventory is open, return
-        if(!IsOwner || inventoryIsOpen) {return;}
+        if(!IsOwner || isAnyUIOpen) {return;}
 
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource")){
-                 CollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
+                CollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
+            }else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable")){
+                 //if the player is looking at an Interactable and clicks E
+                if(hit.collider.CompareTag("Blacksmith")){
+                    //its the blacksmith
+                    npcUiHandler.openOrCloseBlackSmithUI();
+                }
+               
+                
             }
         }
     }
@@ -174,6 +186,21 @@ public class RayCastingHandler : NetworkBehaviour
             }
         }
     }
+    
+    private void isInteractable(bool canPerformAction){
+        if(!canPerformAction) return;
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
+        {
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable"))
+            {
+                centerUIHandlerScript.setCenterDotColor(interactableColor); // Set center dot color for collectible resources
+            }
+        }
+
+    }
 
     
 
@@ -201,9 +228,9 @@ public class RayCastingHandler : NetworkBehaviour
     }
 
     // Block the player from clicking and getting resources while the inventory is open
-    public void setInventoryIsOpen(bool value)
+    public void setIsAnyUIOpen(bool value)
     {
-        inventoryIsOpen = value;
+        isAnyUIOpen = value;
     }
 
     // Collectible resource function to add resources to the player inventory
@@ -273,5 +300,6 @@ public class RayCastingHandler : NetworkBehaviour
 
         centerUIHandlerScript = entirePlayerUIInstance.GetComponent<CenterUIHandler>();
         resourceHPBarScript = entirePlayerUIInstance.GetComponent<ResourceHPBar>();
+        npcUiHandler = entirePlayerUIInstance.GetComponent<NPCUIHandler>();
     }
 }

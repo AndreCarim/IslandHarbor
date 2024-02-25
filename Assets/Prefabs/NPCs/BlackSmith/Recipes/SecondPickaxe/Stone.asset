@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ff346f762e814258a4a9758c2e4ffde, type: 3}
-  m_Name: Wood
+  m_Name: Stone
   m_EditorClassIdentifier: 
-  resource: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
-  amount: 1
+  resource: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  amount: 60
