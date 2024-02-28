@@ -2026,6 +2026,7 @@ MonoBehaviour:
   genericSlot: {fileID: 3480182864823443949, guid: d072fd2b733e04cafa4dc06d0ec87a62, type: 3}
   slotContent: {fileID: 5703410404431349046}
   craftButton: {fileID: 8125195002284748439}
+  blackSmithUI: {fileID: 6010552406611067159}
 --- !u!1 &4232418681299294803
 GameObject:
   m_ObjectHideFlags: 0
@@ -3681,6 +3682,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blackSmithUI: {fileID: 6010552406611067159}
+  blackSmithUIHandlerScript: {fileID: 8976807419762332399}
+  player: {fileID: 0}
 --- !u!1 &6484122781835363466
 GameObject:
   m_ObjectHideFlags: 0
@@ -4281,9 +4284,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8976807419762332399}
-        m_TargetAssemblyTypeName: BlackSmithUiHandler, Assembly-CSharp
-        m_MethodName: closeUI
+      - m_Target: {fileID: 5334446284291798015}
+        m_TargetAssemblyTypeName: NPCUIHandler, Assembly-CSharp
+        m_MethodName: openOrCloseBlackSmithUI
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

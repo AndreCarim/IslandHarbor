@@ -11,6 +11,8 @@ public class DroppedResource : NetworkBehaviour
     private float minDestroyTime = 120f;
     private float maxDestroyTime = 130f;
 
+
+
     public override void OnNetworkSpawn()
     {   
         if(IsServer) {
@@ -27,6 +29,10 @@ public class DroppedResource : NetworkBehaviour
         
     }
 
+   
+   
+
+
     public void setResource(int amountFromServer, ResourceGenericHandler resource)
     {
         amount = amountFromServer;
@@ -40,4 +46,8 @@ public class DroppedResource : NetworkBehaviour
     public int getAmount(){
         return amount;
     }
+
+
+
+
 }
