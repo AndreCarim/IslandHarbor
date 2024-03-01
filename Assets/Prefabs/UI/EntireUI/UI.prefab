@@ -3669,6 +3669,7 @@ MonoBehaviour:
   axeEquippedSlot: {fileID: 3506274571831424185}
   pickAxeEquippedSlot: {fileID: 2127512615151197777}
   weaponEquippedSlot: {fileID: 8834424961669636135}
+  clockTimer: {fileID: 843218370591701990}
 --- !u!114 &5334446284291798015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9519,6 +9520,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 923c824d5a3ec4aa9a8478a3f6c25a3f, type: 3}
+--- !u!114 &843218370591701990 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2257630472018294472, guid: 923c824d5a3ec4aa9a8478a3f6c25a3f, type: 3}
+  m_PrefabInstance: {fileID: 1506172944404761902}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &998836720677021721 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1818210583915078967, guid: 923c824d5a3ec4aa9a8478a3f6c25a3f, type: 3}

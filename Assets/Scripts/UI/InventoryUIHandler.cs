@@ -39,6 +39,7 @@ public class InventoryUIHandler : NetworkBehaviour
     [SerializeField] private GameObject axeEquippedSlot;
     [SerializeField] private GameObject pickAxeEquippedSlot;
     [SerializeField] private GameObject weaponEquippedSlot;
+    [SerializeField] private TextMeshProUGUI clockTimer;
 
     private GameObject player;
 
@@ -54,6 +55,13 @@ public class InventoryUIHandler : NetworkBehaviour
     private Coroutine shakeCoroutine;
      // Initial position of the slot
     private Vector3 originalPosition;
+
+
+    void Update(){
+        if(!IsOwner) return;
+
+        if(inventoryUI.activeSelf)setClock();
+    }
 
     // Method to check if the player's inventory is currently active
     public bool checkActiveInventory()
@@ -73,8 +81,11 @@ public class InventoryUIHandler : NetworkBehaviour
             slot = null;
         }
 
+
         // Determine whether the inventory is open or closed
         bool isOpen = !inventoryUI.activeSelf;
+
+        
 
         // Set the inventory UI active state based on whether it's open or closed
         inventoryUI.SetActive(isOpen);
@@ -398,6 +409,30 @@ public class InventoryUIHandler : NetworkBehaviour
     public void setSlotNull(){
         slot = null;
         resourceSelected = null;
+    }
+
+    private void setClock(){
+         // Find the DayCycle GameObject in the scene
+        GameObject dayCycleObject = GameObject.Find("DayCycle"); // Replace "DayCycle" with the actual name of your GameObject
+        
+        // Check if the GameObject is found
+        if(dayCycleObject != null){
+            // Get the DayCycleHandler component attached to the GameObject
+            DayCycleHandler dayCycleHandler = dayCycleObject.GetComponent<DayCycleHandler>();
+            
+            // Check if the DayCycleHandler component is found
+            if(dayCycleHandler != null){
+                // Call the getTime method
+               string currentTime = dayCycleHandler.getTime();
+                clockTimer.text = currentTime;
+            }
+            else{
+                Debug.LogWarning("DayCycleHandler component not found on DayCycle GameObject.");
+            }
+        }
+        else{
+            Debug.LogWarning("DayCycle GameObject not found in the scene.");
+        }
     }
 
 
