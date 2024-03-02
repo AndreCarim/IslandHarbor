@@ -40,6 +40,7 @@ public class InventoryUIHandler : NetworkBehaviour
     [SerializeField] private GameObject pickAxeEquippedSlot;
     [SerializeField] private GameObject weaponEquippedSlot;
     [SerializeField] private TextMeshProUGUI clockTimer;
+    [SerializeField] private TextMeshProUGUI currentDayCountText;
 
     private GameObject player;
 
@@ -423,8 +424,11 @@ public class InventoryUIHandler : NetworkBehaviour
             // Check if the DayCycleHandler component is found
             if(dayCycleHandler != null){
                 // Call the getTime method
-               string currentTime = dayCycleHandler.getTime();
+                string currentTime = dayCycleHandler.getTime();
                 clockTimer.text = currentTime;
+
+                string dayCountText = "Day " + dayCycleHandler.getCurrentDay().ToString(); 
+                currentDayCountText.text = dayCountText;
             }
             else{
                 Debug.LogWarning("DayCycleHandler component not found on DayCycle GameObject.");
