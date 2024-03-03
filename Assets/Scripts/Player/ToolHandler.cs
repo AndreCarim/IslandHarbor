@@ -186,6 +186,7 @@ public class ToolHandler : NetworkBehaviour
 
 
         }
+        change3DEquipment();
     }
 
     public void removeEquippedEquipmentByDropOrUnequip(ResourceGenericHandler equipment){
@@ -201,6 +202,7 @@ public class ToolHandler : NetworkBehaviour
             currentEquipment = currentAxe;
             toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
             toolUIHandler.setIsOn(0);
+            
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.PickAxe){
             //player is trying to remove the right pickaxe
             if(currentPickAxe){
@@ -211,6 +213,7 @@ public class ToolHandler : NetworkBehaviour
             currentEquipment = currentPickAxe;
             toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
             toolUIHandler.setIsOn(1);
+            
         }else if(equipment.getResourceType() == ResourceEnum.ResourceType.Weapon){
             //player is trying to remove the right weapon
             if(currentWeapon){
@@ -221,7 +224,9 @@ public class ToolHandler : NetworkBehaviour
             currentEquipment = currentWeapon;
             toolUIHandler.removeEquippedEquipmentByDropOrUnequip(equipment);
             toolUIHandler.setIsOn(2);
+
         }
+        change3DEquipment();
     }
 
    

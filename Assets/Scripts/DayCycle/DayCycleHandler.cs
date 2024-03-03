@@ -9,8 +9,11 @@ using Unity.Netcode;
 public class DayCycleHandler : NetworkBehaviour
 {
     // Set the starting hour as a variable
-    private const float STARTING_HOUR = 7f; // It will start at 7 am
-    private const float HOW_LONG_IS_THE_DAY_IN_MINUTES = .5f; // Change here for how long you want the day to last in minutes.
+    private const float STARTING_HOUR = 7f; // change here to set the starting time
+    private const float HOW_LONG_IS_THE_DAY_IN_MINUTES = 30f; // Change here for how long you want the day to last in minutes.
+    private const float NIGHT_START = 22f;//change here to set when the night should start
+    private const float NIGHT_END = 7f;//change here to set when the night will end
+    private NetworkVariable<bool> isNight = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     private float secondsPerDay;
     private float elapsedTime = 0f;
     private NetworkVariable<int> currentHour = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -18,9 +21,14 @@ public class DayCycleHandler : NetworkBehaviour
     private NetworkVariable<int> currentSecond = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     private NetworkVariable<int> currentDay = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+   [SerializeField] private GameObject anouncementObject;
+   [SerializeField] private TextMeshProUGUI anouncementText;
+    private float howLongTextShow = 3f; // Duration for which the object will be shown in seconds
+
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
+        currentDay.Value = 1;
 
         secondsPerDay = HOW_LONG_IS_THE_DAY_IN_MINUTES * 60f;
     }
@@ -34,6 +42,7 @@ public class DayCycleHandler : NetworkBehaviour
         {
             currentDay.Value ++;
             elapsedTime -= secondsPerDay;
+            handleDayStartClientRpc(currentDay.Value);
         }
 
         UpdateTimeServerRpc();
@@ -47,7 +56,7 @@ public class DayCycleHandler : NetworkBehaviour
         // Check if the DayCycleHandler component is enabled
         if (!enabled || !gameObject)
         {
-            Debug.LogWarning("DayCycleHandler component is not enabled.");
+            Debug.LogWarning("DayCycleHandler component is not enabled or not available at the scene");
             return;
         }
 
@@ -69,6 +78,43 @@ public class DayCycleHandler : NetworkBehaviour
         currentMinute.Value = Mathf.FloorToInt(remainingMinutes) % 60;
         // Calculate current second
         currentSecond.Value = Mathf.FloorToInt((remainingMinutes - currentMinute.Value) * 60f);
+
+        // Check if the current hour matches the night start (10 pm)
+        if (currentHour.Value == Mathf.FloorToInt(NIGHT_START) && isNight.Value == false)
+        {
+            isNight.Value = true;
+            HandleNightStartClientRpc();
+        }
+        // Check if the current hour matches the night end (7 am)
+        else if (currentHour.Value == Mathf.FloorToInt(NIGHT_END) && isNight.Value == true)
+        {
+            isNight.Value = false;
+            HandleNightEndClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    private void HandleNightStartClientRpc()
+    {
+        //if(!IsOwner)return;
+
+        anouncementText.text = "Night Started";
+        StartCoroutine(ShowObjectCoroutine());
+        // This method will be called when the clock hits NIGHT_START
+    }
+
+    [ClientRpc]
+    private void HandleNightEndClientRpc()
+    {
+        // This method will be called when the clock hits NIGHT_END 
+    }
+    
+    [ClientRpc]
+    private void handleDayStartClientRpc(int day){
+        //if(!IsOwner)return;
+
+        anouncementText.text = "Day " + day.ToString();
+        StartCoroutine(ShowObjectCoroutine());
     }
 
     private string GetAmPm(int hour)
@@ -77,6 +123,19 @@ public class DayCycleHandler : NetworkBehaviour
             return "PM";
         else
             return "AM";
+    }
+
+
+    IEnumerator ShowObjectCoroutine()
+    {
+        // Activate the object
+        anouncementObject.SetActive(true);
+
+        // Wait for the specified duration
+        yield return new WaitForSeconds(howLongTextShow);
+
+        // Deactivate the object
+        anouncementObject.SetActive(false);
     }
 
     private string FormatTime(int hour, int minute)
@@ -91,5 +150,9 @@ public class DayCycleHandler : NetworkBehaviour
 
     public int getCurrentDay(){
         return currentDay.Value;
+    }
+
+    public bool getIsNight(){
+        return isNight.Value;
     }
 }
