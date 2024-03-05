@@ -30,46 +30,54 @@ public class ResourceInventory : NetworkBehaviour
     private Coroutine shakeCoroutine;
 
     private bool canOpenInventory = true;
+    private bool canCloseInventory = true;//if the menu is open, player cant close the inventory
 
     [SerializeField] private ResourceList resourceList;
 
+    private PlayerInput playerInput;
+    private PlayerInput.OnFootActions onFoot;
+
     void Start(){
         mainCamera = Camera.main;
+
+        playerInput = new PlayerInput();
+        onFoot = playerInput.OnFoot;
+
+        onFoot.OpenInventory.started += ctx => openInventory();
+
+        onFoot.Enable();
     }
 
-    void Update()
-    {
 
+    private void openInventory(){
           // Check if the client is the owner of the object
-        if (!IsOwner || !canOpenInventory)
+        if (!IsOwner || !canOpenInventory || !canCloseInventory)
             return; // Exit the method if not the owner
 
-        // Check if the player presses the Tab or I key
-        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.I))
-        {
-            // Toggle the visibility of the inventory UI panel
-            bool isOpen = inventoryUIHandlerScript.checkActiveInventory();
-            inventoryUIHandlerScript.setWeight(currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped(), currentMaxCarryWeight);
+       
+        // Toggle the visibility of the inventory UI panel
+        bool isOpen = inventoryUIHandlerScript.checkActiveInventory();
+        inventoryUIHandlerScript.setWeight(currentCarryWeight + gameObject.GetComponent<ToolHandler>().getCurrentWeightEquipped(), currentMaxCarryWeight);
 
-             // Call different functions based on the inventory state
-            if (isOpen)
-            {
-                //oppening the inventory
-                cameraScript.setIsFreeToLook(false); //lock the mouse
-                movementScript.setCanWalk(false); // lock walking
-                clickScript.setIsAnyUIOpen(true); // lock clicking 
-                inventoryUIHandlerScript.setUIInfo(false); // closing the uiInfo
-                inventoryUIHandlerScript.setStatsUI(false); // closing the uiStats
-                slot = null;
-            }
-            else
-            {
-                //closing the inventory
-                cameraScript.setIsFreeToLook(true); // unlock the mouse
-                movementScript.setCanWalk(true); // unlock the walk
-                clickScript.setIsAnyUIOpen(false); // unlock clicking
-                inventoryUIHandlerScript.setToolTip(false);
-            }
+        // Call different functions based on the inventory state
+        if (isOpen)
+        {
+            //oppening the inventory
+            cameraScript.setIsFreeToLook(false); //lock the mouse
+            movementScript.setCanWalk(false); // lock walking
+            clickScript.setIsAnyUIOpen(true); // lock clicking 
+            inventoryUIHandlerScript.setUIInfo(false); // closing the uiInfo
+            inventoryUIHandlerScript.setStatsUI(false); // closing the uiStats
+            slot = null;
+        }
+        else
+        {
+                
+            //closing the inventory
+            cameraScript.setIsFreeToLook(true); // unlock the mouse
+            movementScript.setCanWalk(true); // unlock the walk
+            clickScript.setIsAnyUIOpen(false); // unlock clicking
+            inventoryUIHandlerScript.setToolTip(false);
         }
     }
 
@@ -568,4 +576,7 @@ public class ResourceInventory : NetworkBehaviour
         canOpenInventory = value;
     }
    
+    public void setCanCloseInventory(bool value){
+        canCloseInventory = value;
+    }
 }

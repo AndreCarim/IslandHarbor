@@ -71,6 +71,42 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenInventory"",
+                    ""type"": ""Button"",
+                    ""id"": ""a65b4db6-042d-48d5-8d5c-c76740885ec7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToolOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""7331a7ed-9820-464e-ab57-00c9d4229b95"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToolTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""1c0fe19f-2113-4b06-952b-5a0d68eff6d4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToolThree"",
+                    ""type"": ""Button"",
+                    ""id"": ""c30a8446-63d2-4c3f-9081-b46b71f60dbb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -260,6 +296,72 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""EInteraction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9379f9ea-7bd2-40e7-8094-1a6f315aeeca"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b1a698ea-8bae-42b4-a56b-996b07629ca8"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""84368ba1-b65f-441e-a0e1-fe78a5b56ac7"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6cffbcf5-44be-4934-a213-b83601feea54"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToolOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3d2355a7-11af-497f-b0b2-3130baa2e16e"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToolTwo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""80d0d75a-fead-4537-8a8e-194c9cf9aefa"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToolThree"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -290,6 +392,45 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""GeneralInput"",
+            ""id"": ""460911b5-f013-4405-8940-581edc99b53f"",
+            ""actions"": [
+                {
+                    ""name"": ""OpenMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""2ee9ca12-336b-4ce6-8dab-0292cf0e2afa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""327faf46-8e5c-4a5b-b8cd-37440a3a11f1"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8fee02be-5d86-490b-8adf-22ce9964d35c"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -301,9 +442,16 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_OnFoot_Look = m_OnFoot.FindAction("Look", throwIfNotFound: true);
         m_OnFoot_LMClick = m_OnFoot.FindAction("LMClick", throwIfNotFound: true);
         m_OnFoot_EInteraction = m_OnFoot.FindAction("EInteraction", throwIfNotFound: true);
+        m_OnFoot_OpenInventory = m_OnFoot.FindAction("OpenInventory", throwIfNotFound: true);
+        m_OnFoot_ToolOne = m_OnFoot.FindAction("ToolOne", throwIfNotFound: true);
+        m_OnFoot_ToolTwo = m_OnFoot.FindAction("ToolTwo", throwIfNotFound: true);
+        m_OnFoot_ToolThree = m_OnFoot.FindAction("ToolThree", throwIfNotFound: true);
         // Gliding
         m_Gliding = asset.FindActionMap("Gliding", throwIfNotFound: true);
         m_Gliding_Newaction = m_Gliding.FindAction("New action", throwIfNotFound: true);
+        // GeneralInput
+        m_GeneralInput = asset.FindActionMap("GeneralInput", throwIfNotFound: true);
+        m_GeneralInput_OpenMenu = m_GeneralInput.FindAction("OpenMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -370,6 +518,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_OnFoot_Look;
     private readonly InputAction m_OnFoot_LMClick;
     private readonly InputAction m_OnFoot_EInteraction;
+    private readonly InputAction m_OnFoot_OpenInventory;
+    private readonly InputAction m_OnFoot_ToolOne;
+    private readonly InputAction m_OnFoot_ToolTwo;
+    private readonly InputAction m_OnFoot_ToolThree;
     public struct OnFootActions
     {
         private @PlayerInput m_Wrapper;
@@ -379,6 +531,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_OnFoot_Look;
         public InputAction @LMClick => m_Wrapper.m_OnFoot_LMClick;
         public InputAction @EInteraction => m_Wrapper.m_OnFoot_EInteraction;
+        public InputAction @OpenInventory => m_Wrapper.m_OnFoot_OpenInventory;
+        public InputAction @ToolOne => m_Wrapper.m_OnFoot_ToolOne;
+        public InputAction @ToolTwo => m_Wrapper.m_OnFoot_ToolTwo;
+        public InputAction @ToolThree => m_Wrapper.m_OnFoot_ToolThree;
         public InputActionMap Get() { return m_Wrapper.m_OnFoot; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -403,6 +559,18 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @EInteraction.started += instance.OnEInteraction;
             @EInteraction.performed += instance.OnEInteraction;
             @EInteraction.canceled += instance.OnEInteraction;
+            @OpenInventory.started += instance.OnOpenInventory;
+            @OpenInventory.performed += instance.OnOpenInventory;
+            @OpenInventory.canceled += instance.OnOpenInventory;
+            @ToolOne.started += instance.OnToolOne;
+            @ToolOne.performed += instance.OnToolOne;
+            @ToolOne.canceled += instance.OnToolOne;
+            @ToolTwo.started += instance.OnToolTwo;
+            @ToolTwo.performed += instance.OnToolTwo;
+            @ToolTwo.canceled += instance.OnToolTwo;
+            @ToolThree.started += instance.OnToolThree;
+            @ToolThree.performed += instance.OnToolThree;
+            @ToolThree.canceled += instance.OnToolThree;
         }
 
         private void UnregisterCallbacks(IOnFootActions instance)
@@ -422,6 +590,18 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @EInteraction.started -= instance.OnEInteraction;
             @EInteraction.performed -= instance.OnEInteraction;
             @EInteraction.canceled -= instance.OnEInteraction;
+            @OpenInventory.started -= instance.OnOpenInventory;
+            @OpenInventory.performed -= instance.OnOpenInventory;
+            @OpenInventory.canceled -= instance.OnOpenInventory;
+            @ToolOne.started -= instance.OnToolOne;
+            @ToolOne.performed -= instance.OnToolOne;
+            @ToolOne.canceled -= instance.OnToolOne;
+            @ToolTwo.started -= instance.OnToolTwo;
+            @ToolTwo.performed -= instance.OnToolTwo;
+            @ToolTwo.canceled -= instance.OnToolTwo;
+            @ToolThree.started -= instance.OnToolThree;
+            @ToolThree.performed -= instance.OnToolThree;
+            @ToolThree.canceled -= instance.OnToolThree;
         }
 
         public void RemoveCallbacks(IOnFootActions instance)
@@ -485,6 +665,52 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         }
     }
     public GlidingActions @Gliding => new GlidingActions(this);
+
+    // GeneralInput
+    private readonly InputActionMap m_GeneralInput;
+    private List<IGeneralInputActions> m_GeneralInputActionsCallbackInterfaces = new List<IGeneralInputActions>();
+    private readonly InputAction m_GeneralInput_OpenMenu;
+    public struct GeneralInputActions
+    {
+        private @PlayerInput m_Wrapper;
+        public GeneralInputActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @OpenMenu => m_Wrapper.m_GeneralInput_OpenMenu;
+        public InputActionMap Get() { return m_Wrapper.m_GeneralInput; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(GeneralInputActions set) { return set.Get(); }
+        public void AddCallbacks(IGeneralInputActions instance)
+        {
+            if (instance == null || m_Wrapper.m_GeneralInputActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_GeneralInputActionsCallbackInterfaces.Add(instance);
+            @OpenMenu.started += instance.OnOpenMenu;
+            @OpenMenu.performed += instance.OnOpenMenu;
+            @OpenMenu.canceled += instance.OnOpenMenu;
+        }
+
+        private void UnregisterCallbacks(IGeneralInputActions instance)
+        {
+            @OpenMenu.started -= instance.OnOpenMenu;
+            @OpenMenu.performed -= instance.OnOpenMenu;
+            @OpenMenu.canceled -= instance.OnOpenMenu;
+        }
+
+        public void RemoveCallbacks(IGeneralInputActions instance)
+        {
+            if (m_Wrapper.m_GeneralInputActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IGeneralInputActions instance)
+        {
+            foreach (var item in m_Wrapper.m_GeneralInputActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_GeneralInputActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public GeneralInputActions @GeneralInput => new GeneralInputActions(this);
     public interface IOnFootActions
     {
         void OnMovement(InputAction.CallbackContext context);
@@ -492,9 +718,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnLMClick(InputAction.CallbackContext context);
         void OnEInteraction(InputAction.CallbackContext context);
+        void OnOpenInventory(InputAction.CallbackContext context);
+        void OnToolOne(InputAction.CallbackContext context);
+        void OnToolTwo(InputAction.CallbackContext context);
+        void OnToolThree(InputAction.CallbackContext context);
     }
     public interface IGlidingActions
     {
         void OnNewaction(InputAction.CallbackContext context);
+    }
+    public interface IGeneralInputActions
+    {
+        void OnOpenMenu(InputAction.CallbackContext context);
     }
 }

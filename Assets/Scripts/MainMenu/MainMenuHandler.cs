@@ -16,18 +16,32 @@ public class MainMenuHandler : NetworkBehaviour
 
     private const int MAX_PLAYER_AMOUNT = 4;
 
-    private void Awake(){
+    public static MainMenuHandler Instance{get; private set;}
 
+    public event EventHandler OnTryingToJoinGame;
+    public event EventHandler OnFailedToJoinGame;
+
+    private void Awake(){
+        Instance = this;
 
         createGameButton.onClick.AddListener(() => {
+            //start the Host
             NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
             NetworkManager.Singleton.StartHost();
             NetworkManager.Singleton.SceneManager.LoadScene("CharacterSelect", LoadSceneMode.Single);
         });
 
         joinGameButton.onClick.AddListener(() => {
-            NetworkManager.Singleton.StartClient();//start the client
+            //start the client
+            OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_OnClientDiscconectCallback;
+            NetworkManager.Singleton.StartClient();
         });
+    }
+
+    private void NetorkManager_OnClientDiscconectCallback(ulong clientId){
+        OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -44,7 +58,6 @@ public class MainMenuHandler : NetworkBehaviour
             //the host is no longer on the characterselect scene, therefore the client cant join
             response.Approved = false;
             response.Reason = "Game has already started";
-
             return;
         }
 
@@ -56,7 +69,7 @@ public class MainMenuHandler : NetworkBehaviour
             return;
         }
         
-
+       
         //there is room in the game and game has not started yet
         response.Approved = true;
     }

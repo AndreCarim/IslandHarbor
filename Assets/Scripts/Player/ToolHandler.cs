@@ -23,6 +23,9 @@ public class ToolHandler : NetworkBehaviour
 
     private int currentWeightEquipped;
 
+    private PlayerInput playerInput;
+    private PlayerInput.OnFootActions onFoot;
+
     //-------------------------------------//
     //            ANIMATIONS               //
     //-------------------------------------//
@@ -36,47 +39,50 @@ public class ToolHandler : NetworkBehaviour
 
 
     public override void OnNetworkSpawn(){
+        playerInput = new PlayerInput();
+        onFoot = playerInput.OnFoot;
+
+        onFoot.ToolOne.started += ctx => pressedOneButton();
+        onFoot.ToolTwo.started += ctx => pressedTwoButton();
+        onFoot.ToolThree.started += ctx => pressedThreeButton();
+
         currentEquipment = currentAxe;
+        change3DEquipment();
+
+        onFoot.Enable();
+    }
+
+    private void pressedOneButton(){
+        if(!IsOwner) return;
+
+        if(currentEquipment != currentAxe){
+            currentEquipment = currentAxe;
+            toolUIHandler.setIsOn(0);
+        }
         change3DEquipment();
     }
 
-    //this will handle the changing of tool pressing 1,2 and 3
-    void Update()
-    {
-
+    private void pressedTwoButton(){
         if(!IsOwner) return;
 
-        // Check if the player pressed the 1 key
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            if(currentEquipment != currentAxe){
-                currentEquipment = currentAxe;
-                toolUIHandler.setIsOn(0);
-            }
-            change3DEquipment();
+        if(currentEquipment != currentPickAxe){
+            currentEquipment = currentPickAxe;
+            toolUIHandler.setIsOn(1);
         }
+        // Call a function or perform an action related to key 2
+        change3DEquipment();
 
-        // Check if the player pressed the 2 key
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            if(currentEquipment != currentPickAxe){
-                currentEquipment = currentPickAxe;
-                toolUIHandler.setIsOn(1);
-            }
-            // Call a function or perform an action related to key 2
-            change3DEquipment();
-        }
+    }
 
-        // Check if the player pressed the 3 key
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            if(currentEquipment != currentWeapon){
-                currentEquipment = currentWeapon;
-                toolUIHandler.setIsOn(2);
-            }
-            // Call a function or perform an action related to key 3
-            change3DEquipment();
+    private void pressedThreeButton(){
+        if(!IsOwner) return;
+
+        if(currentEquipment != currentWeapon){
+            currentEquipment = currentWeapon;
+            toolUIHandler.setIsOn(2);
         }
+        // Call a function or perform an action related to key 3
+        change3DEquipment();
     }
 
     private void change3DEquipment()

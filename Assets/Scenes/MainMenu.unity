@@ -208,13 +208,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 252306071}
+  - component: {fileID: 252306072}
   m_Layer: 5
   m_Name: Warning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &252306071
 RectTransform:
   m_ObjectHideFlags: 0
@@ -237,6 +238,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &252306072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252306070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c326b7a89cd7f48c1bbab2e6fd050ddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  warningText: {fileID: 1494229241}
+  closeButton: {fileID: 261541664}
 --- !u!1 &261541662
 GameObject:
   m_ObjectHideFlags: 0
@@ -1476,13 +1491,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1619554022}
+  - component: {fileID: 1619554023}
   m_Layer: 5
   m_Name: Connecting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1619554022
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1504,6 +1520,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1619554023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1619554021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28828a35e6d9349d1b6b79b4faf3e9a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1674320755
 GameObject:
   m_ObjectHideFlags: 0

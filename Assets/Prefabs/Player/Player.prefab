@@ -504,6 +504,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7705903995372977349}
     m_Modifications:
+    - target: {fileID: 112881841103490356, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 112881841103490356, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 568869445944763177, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -600,6 +608,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2937871375509672539, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3083404346406568580, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -636,6 +648,10 @@ PrefabInstance:
       propertyPath: m_Value
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5795017770412144256, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
+      propertyPath: inventoryScript
+      value: 
+      objectReference: {fileID: 7127976598458327535}
     - target: {fileID: 6199045308627965160, guid: 9dc5ef261575f4c498e5b4aa39138de7, type: 3}
       propertyPath: m_Name
       value: UI
