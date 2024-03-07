@@ -62,7 +62,7 @@
                 {
                     "name": "ToolOne",
                     "type": "Button",
-                    "id": "7331a7ed-9820-464e-ab57-00c9d4229b95",
+                    "id": "b1813f22-1f19-4190-a23a-be8f30af9d2f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -71,7 +71,7 @@
                 {
                     "name": "ToolTwo",
                     "type": "Button",
-                    "id": "1c0fe19f-2113-4b06-952b-5a0d68eff6d4",
+                    "id": "736d2c5e-4b08-4b32-9701-ab4a80152005",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -80,7 +80,7 @@
                 {
                     "name": "ToolThree",
                     "type": "Button",
-                    "id": "c30a8446-63d2-4c3f-9081-b46b71f60dbb",
+                    "id": "0c45cbcf-1591-4bc4-bd87-db3f517d0bbd",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -310,7 +310,7 @@
                 },
                 {
                     "name": "",
-                    "id": "6cffbcf5-44be-4934-a213-b83601feea54",
+                    "id": "588c5b75-8f10-4393-89ea-84460df03651",
                     "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "",
@@ -321,7 +321,7 @@
                 },
                 {
                     "name": "",
-                    "id": "3d2355a7-11af-497f-b0b2-3130baa2e16e",
+                    "id": "92c86bbe-fcf1-4f94-81de-b3dc8bb046cf",
                     "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
@@ -332,7 +332,7 @@
                 },
                 {
                     "name": "",
-                    "id": "80d0d75a-fead-4537-8a8e-194c9cf9aefa",
+                    "id": "4bbf3dc5-2ccf-4ec1-9ef1-bce51316ffdc",
                     "path": "<Keyboard>/3",
                     "interactions": "",
                     "processors": "",

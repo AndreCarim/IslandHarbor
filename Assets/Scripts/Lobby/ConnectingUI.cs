@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class ConnectingUI : MonoBehaviour
 {
+
+    [SerializeField] private Transform connectinUI;
     private void Start(){
-        MainMenuHandler.Instance.OnTryingToJoinGame += MainMenu_OnTryingToJoinGame;
-        MainMenuHandler.Instance.OnFailedToJoinGame += MainMenu_OnFailedToJoinGame;
+        LobbyHandler.Instance.OnTryingToJoinGame += MainMenu_OnTryingToJoinGame;
+        LobbyHandler.Instance.OnFailedToJoinGame += MainMenu_OnFailedToJoinGame;
 
         hide();
     }
@@ -20,15 +22,15 @@ public class ConnectingUI : MonoBehaviour
     }
 
     private void Show(){
-        gameObject.SetActive(true);
+        connectinUI.gameObject.SetActive(true);
     }
 
     private void hide(){
-        gameObject.SetActive(false);
+        connectinUI.gameObject.SetActive(false);
     }
 
     private void OnDestroy() {
-        MainMenuHandler.Instance.OnTryingToJoinGame -= MainMenu_OnTryingToJoinGame;
-        MainMenuHandler.Instance.OnFailedToJoinGame -= MainMenu_OnFailedToJoinGame;
+        LobbyHandler.Instance.OnTryingToJoinGame -= MainMenu_OnTryingToJoinGame;
+        LobbyHandler.Instance.OnFailedToJoinGame -= MainMenu_OnFailedToJoinGame;
     }
 }

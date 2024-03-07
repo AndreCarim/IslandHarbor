@@ -88,4 +88,11 @@ public class InputMovement : NetworkBehaviour
     public void setCanWalk(bool value){
         canWalk = value;
     }
+
+    
+
+    private void OnDisable() {
+        if(!IsOwner) return;
+        onFoot.Disable();
+    }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
+using UnityEngine.InputSystem;
 
 public class RayCastingHandler : NetworkBehaviour
 {
@@ -43,6 +44,7 @@ public class RayCastingHandler : NetworkBehaviour
 
         onFoot.LMClick.started += ctx => LMClick();
         onFoot.EInteraction.started += ctx => EInteraction();
+
         onFoot.Enable();
     }
    
@@ -301,5 +303,13 @@ public class RayCastingHandler : NetworkBehaviour
         centerUIHandlerScript = entirePlayerUIInstance.GetComponent<CenterUIHandler>();
         resourceHPBarScript = entirePlayerUIInstance.GetComponent<ResourceHPBar>();
         npcUiHandler = entirePlayerUIInstance.GetComponent<NPCUIHandler>();
+    }
+
+
+
+    
+    private void OnDisable() {
+        if(!IsOwner) return;
+        onFoot.Disable();
     }
 }

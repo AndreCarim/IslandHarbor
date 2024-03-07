@@ -86,4 +86,12 @@ public class CameraInput : NetworkBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
     }
+
+    
+
+     private void OnDisable() {
+        if(!IsOwner) return;
+        Cursor.lockState = CursorLockMode.None;
+        onFoot.Disable();
+    }
 }

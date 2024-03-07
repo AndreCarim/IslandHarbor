@@ -37,7 +37,9 @@ public class ResourceInventory : NetworkBehaviour
     private PlayerInput playerInput;
     private PlayerInput.OnFootActions onFoot;
 
-    void Start(){
+    public void Start(){
+        if(!IsOwner) return;
+
         mainCamera = Camera.main;
 
         playerInput = new PlayerInput();
@@ -46,6 +48,7 @@ public class ResourceInventory : NetworkBehaviour
         onFoot.OpenInventory.started += ctx => openInventory();
 
         onFoot.Enable();
+
     }
 
 
@@ -578,5 +581,11 @@ public class ResourceInventory : NetworkBehaviour
    
     public void setCanCloseInventory(bool value){
         canCloseInventory = value;
+    }
+
+
+     private void OnDisable() {
+        if(!IsOwner) return;
+        onFoot.Disable();
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 public class InGameMenuhandler : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class InGameMenuhandler : MonoBehaviour
     [SerializeField] private Button returnButton;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button openInGameMenuButton;
+    [SerializeField] private Button quitGame;
 
     [SerializeField] private ResourceInventory inventoryScript;
 
@@ -18,9 +21,10 @@ public class InGameMenuhandler : MonoBehaviour
     private PlayerInput playerInput;
     private PlayerInput.GeneralInputActions generalInput;
 
-    private void Start(){
+    private void Awake(){
         returnButton.onClick.AddListener(hide);
         openInGameMenuButton.onClick.AddListener(show);
+        quitGame.onClick.AddListener(quit);
 
         mainMenuButton.onClick.AddListener(sendPlayerToMainMenu);
 
@@ -35,7 +39,12 @@ public class InGameMenuhandler : MonoBehaviour
 
 
     private void sendPlayerToMainMenu(){
-        Debug.Log("Go back to main menu");
+        NetworkManager.Singleton.Shutdown();
+
+        if(NetworkManager.Singleton != null){
+            Destroy(NetworkManager.Singleton.gameObject);
+        }
+        SceneManager.LoadScene("MainMenu");
     }
 
     private void hide(){
@@ -48,11 +57,21 @@ public class InGameMenuhandler : MonoBehaviour
     private void show(){
         isMenuOpen = true;
         menuWindow.gameObject.SetActive(true);
+        
 
         inventoryScript.setCanCloseInventory(false);
     }
 
     public bool getIsMenuOpen(){
         return isMenuOpen;
+    }
+
+     private void quit(){
+        // Quit the application
+        Application.Quit();
+    }
+
+    private void OnDisable() {
+        generalInput.Disable();
     }
 }

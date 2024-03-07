@@ -10,7 +10,7 @@ public class DayCycleHandler : NetworkBehaviour
 {
     // Set the starting hour as a variable
     private const float STARTING_HOUR = 7f; // change here to set the starting time
-    private const float HOW_LONG_IS_THE_DAY_IN_MINUTES = 30f; // Change here for how long you want the day to last in minutes.
+    private const float HOW_LONG_IS_THE_DAY_IN_MINUTES = .5f; // Change here for how long you want the day to last in minutes.
     private const float NIGHT_START = 22f;//change here to set when the night should start
     private const float NIGHT_END = 7f;//change here to set when the night will end
     private NetworkVariable<bool> isNight = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);

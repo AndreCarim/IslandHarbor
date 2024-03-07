@@ -256,4 +256,10 @@ public class ToolHandler : NetworkBehaviour
         toolUIHandler.setIsOn(0);
     }
 
+    
+
+     private void OnDisable() {
+        if(!IsOwner) return;
+        onFoot.Disable();
+    }
 }

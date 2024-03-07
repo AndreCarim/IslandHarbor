@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System;
 
-public class MainMenuHandler : NetworkBehaviour
+public class LobbyHandler : MonoBehaviour
 {
     [SerializeField] private Button createGameButton;
     [SerializeField] private Button joinGameButton;
@@ -16,12 +16,15 @@ public class MainMenuHandler : NetworkBehaviour
 
     private const int MAX_PLAYER_AMOUNT = 4;
 
-    public static MainMenuHandler Instance{get; private set;}
+    public static LobbyHandler Instance{get; private set;}
 
     public event EventHandler OnTryingToJoinGame;
     public event EventHandler OnFailedToJoinGame;
 
+    
+
     private void Awake(){
+        
         Instance = this;
 
         createGameButton.onClick.AddListener(() => {
@@ -38,7 +41,9 @@ public class MainMenuHandler : NetworkBehaviour
             NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_OnClientDiscconectCallback;
             NetworkManager.Singleton.StartClient();
         });
-    }
+
+        
+    } 
 
     private void NetorkManager_OnClientDiscconectCallback(ulong clientId){
         OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);

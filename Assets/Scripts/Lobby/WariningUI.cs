@@ -7,6 +7,7 @@ using Unity.Netcode;
 
 public class WariningUI : MonoBehaviour
 {
+    [SerializeField] private Transform WarningUI;
     [SerializeField] TextMeshProUGUI warningText;
     [SerializeField] private Button closeButton;
 
@@ -15,7 +16,7 @@ public class WariningUI : MonoBehaviour
     } 
 
     private void Start(){
-        MainMenuHandler.Instance.OnFailedToJoinGame += MainMenuHandler_OnFailedToJoinGame;
+        LobbyHandler.Instance.OnFailedToJoinGame += MainMenuHandler_OnFailedToJoinGame;
 
         hide();
     }
@@ -35,16 +36,16 @@ public class WariningUI : MonoBehaviour
     }
 
     private void Show(){
-        gameObject.SetActive(true);
+        WarningUI.gameObject.SetActive(true);
     }
 
     private void hide(){
         if(!warningText)return;
 
-        gameObject.SetActive(false);
+        WarningUI.gameObject.SetActive(false);
     }
 
     private void OnDestroy() {
-        MainMenuHandler.Instance.OnFailedToJoinGame -= MainMenuHandler_OnFailedToJoinGame;
+        LobbyHandler.Instance.OnFailedToJoinGame -= MainMenuHandler_OnFailedToJoinGame;
     }
 }
