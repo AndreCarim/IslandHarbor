@@ -7,12 +7,10 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System;
 
-public class LobbyHandler : MonoBehaviour
+public class LobbyHandler : NetworkBehaviour
 {
     [SerializeField] private Button createGameButton;
     [SerializeField] private Button joinGameButton;
-
-   
 
     private const int MAX_PLAYER_AMOUNT = 4;
 
@@ -21,7 +19,6 @@ public class LobbyHandler : MonoBehaviour
     public event EventHandler OnTryingToJoinGame;
     public event EventHandler OnFailedToJoinGame;
 
-    
 
     private void Awake(){
         
@@ -30,6 +27,8 @@ public class LobbyHandler : MonoBehaviour
         createGameButton.onClick.AddListener(() => {
             //start the Host
             NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
+            NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Server_OnClientDiscconectCallback;
             NetworkManager.Singleton.StartHost();
             NetworkManager.Singleton.SceneManager.LoadScene("CharacterSelect", LoadSceneMode.Single);
         });
@@ -38,15 +37,25 @@ public class LobbyHandler : MonoBehaviour
             //start the client
             OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
 
-            NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_OnClientDiscconectCallback;
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Client_OnClientDiscconectCallback;
             NetworkManager.Singleton.StartClient();
         });
-
-        
     } 
 
-    private void NetorkManager_OnClientDiscconectCallback(ulong clientId){
-        OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+    private void NetworkManager_OnClientConnectedCallback(ulong clientId){
+        ClientsHandler.Instance.updateList(clientId);
+    }
+
+    private void NetorkManager_Server_OnClientDiscconectCallback(ulong clientId){
+        //this is only available for the server
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer && NetworkManager.Singleton.IsListening) {
+            ClientsHandler.Instance.removeFromList(clientId);
+        }
+        
+    }    
+
+    private void NetorkManager_Client_OnClientDiscconectCallback(ulong clientId){
+        OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);   
     }
 
 

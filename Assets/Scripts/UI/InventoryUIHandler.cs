@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 
-public class InventoryUIHandler : NetworkBehaviour
+public class InventoryUIHandler : MonoBehaviour
 {
     [SerializeField] private GameObject resourceUIPrefab;
     [SerializeField] private Transform resourceUIParent;
@@ -59,7 +59,7 @@ public class InventoryUIHandler : NetworkBehaviour
 
 
     void Update(){
-        if(!IsOwner) return;
+        //if(!IsOwner) return;
 
         if(inventoryUI.activeSelf)setClock();
     }
@@ -67,12 +67,7 @@ public class InventoryUIHandler : NetworkBehaviour
     // Method to check if the player's inventory is currently active
     public bool checkActiveInventory()
     {
-        // Check if the current client is the owner of the player object
-        if (!IsOwner)
-        {
-            // If not the owner, return false indicating the inventory is not active
-            return false;
-        }
+       // if(!IsOwner)return;
 
         // If the inventory is currently active, reset the selected resource and slot
         //and close everything
@@ -96,7 +91,7 @@ public class InventoryUIHandler : NetworkBehaviour
     }   
 
     public void setweightText(){
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         weightSlider.maxValue = (float)currentMaxCarryWeight;
         weightSlider.value = (float)currentCarryWeight;   
@@ -107,7 +102,7 @@ public class InventoryUIHandler : NetworkBehaviour
 
     public void CreateOrUpdateResourceUI(ResourceGenericHandler resource, int amount)
     {
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         if (resourceUIDictionary.ContainsKey(resource.getId()))
         {
@@ -146,7 +141,7 @@ public class InventoryUIHandler : NetworkBehaviour
     // Method to update UI for a resource
     private void UpdateResourceUI(GameObject resourceUI, int amount)
     {
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
         TextMeshProUGUI amountText = resourceUI.GetComponentInChildren<TextMeshProUGUI>();
 
         // Set the amount text
@@ -159,7 +154,7 @@ public class InventoryUIHandler : NetworkBehaviour
      // Method to remove UI for a resource
     public void RemoveResourceUI(int resourceId)
     {
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         if (resourceUIDictionary.ContainsKey(resourceId))
         {
@@ -170,7 +165,7 @@ public class InventoryUIHandler : NetworkBehaviour
     }
 
     public void setItemInformation(ResourceGenericHandler resourceSelected, bool contains, int maxValue = 0, bool isEquipped = false){
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         if(contains){ //checks if the player has the item
             resourceInfo.text = resourceSelected.getInformationText();
@@ -227,7 +222,7 @@ public class InventoryUIHandler : NetworkBehaviour
     }
 
     public void setTextAmountDrop(){
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         amountDropText.text = amountToDropSlider.value.ToString();
         setweightText();
@@ -246,33 +241,33 @@ public class InventoryUIHandler : NetworkBehaviour
     
 
     public void setMaxDrop(){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         amountToDropSlider.value = amountToDropSlider.maxValue;
         setTextAmountDrop();
     }
 
     public void setMinDrop(){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         amountToDropSlider.value = amountToDropSlider.minValue;
         setTextAmountDrop();
     }
 
     public void setUIInfo(bool value){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         resourceInforUI.SetActive(value);
     }
 
     public void setStatsUI(bool value){
-        if(!IsOwner)return;
+       // if(!IsOwner)return;
 
         statsTabUI.SetActive(value);
     }
 
     public void setResourceSelected(ResourceGenericHandler resourceSelected, GameObject slot, int amount, bool isEquipped = false){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
          if (this.slot != slot)
         {
@@ -291,13 +286,13 @@ public class InventoryUIHandler : NetworkBehaviour
     }
 
     public void dropButtonPressed(){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         player.GetComponent<ResourceInventory>().dropButtonPressed();
     }
 
     public void equipButtonPressed(){
-        if(!IsOwner) return;
+       // if(!IsOwner) return;
 
         player.GetComponent<ResourceInventory>().equipButtonPressed();
     }
@@ -327,7 +322,7 @@ public class InventoryUIHandler : NetworkBehaviour
     // Function to start the shake animation for the slot
     public void StartShaking()
     {
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
         // Stop the previous shaking coroutine if it's running
         if (shakeCoroutine != null)
         {
@@ -371,7 +366,7 @@ public class InventoryUIHandler : NetworkBehaviour
     }
 
     public void stopCoroutine(){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         if (shakeCoroutine != null){
             StopCoroutine(shakeCoroutine);
@@ -381,7 +376,7 @@ public class InventoryUIHandler : NetworkBehaviour
     }
 
     public void setWeight(int currentCarryWeight, int currentMaxCarryWeight){
-        if(!IsOwner){return;}
+      //  if(!IsOwner){return;}
 
         this.currentCarryWeight = currentCarryWeight;
         this.currentMaxCarryWeight = currentMaxCarryWeight;
@@ -390,19 +385,19 @@ public class InventoryUIHandler : NetworkBehaviour
     }
 
     public void setToolTip(bool value){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         toolTip.SetActive(value);
     }
 
     public void setPlayer(GameObject player){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
 
         this.player = player;
     }
 
     public int getAmountToDropSlider(){
-        if(!IsOwner){return 0;}
+       // if(!IsOwner){return 0;}
 
         return (int)amountToDropSlider.value;
     }

@@ -39,11 +39,10 @@ public class InGameMenuhandler : MonoBehaviour
 
 
     private void sendPlayerToMainMenu(){
+        ClientsHandler.Instance.serverIsShuttingDown();
+
         NetworkManager.Singleton.Shutdown();
 
-        if(NetworkManager.Singleton != null){
-            Destroy(NetworkManager.Singleton.gameObject);
-        }
         SceneManager.LoadScene("MainMenu");
     }
 

@@ -12,18 +12,17 @@ public class HostDesconnectHandler : MonoBehaviour
     [SerializeField] private Transform hostDisconnectedUI;
     [SerializeField] private Button mainMenuButton;
 
-    private void Start(){
+    private void Awake(){
         NetworkManager.Singleton.OnClientDisconnectCallback += NetWorkManager_OnClientDisconnectCallBack;
 
         mainMenuButton.onClick.AddListener(goToMainMenu);
     }
 
     private void goToMainMenu(){
+        ClientsHandler.Instance.serverIsShuttingDown();
+
         NetworkManager.Singleton.Shutdown();//shut down the server
 
-        if(NetworkManager.Singleton != null){
-            Destroy(NetworkManager.Singleton.gameObject); // destroy the networkmanager
-        }
         SceneManager.LoadScene("MainMenu");
     }
 

@@ -6,21 +6,20 @@ using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System;
-
-
-public class CharacterSelectScript : NetworkBehaviour
+public class PlayerReadyHandler : NetworkBehaviour
 {
-
-
+    public static PlayerReadyHandler Instance{get; private set;}
     [SerializeField] private Button readyButton; // Serialized field for a UI button to indicate readiness
     [SerializeField] private Button mainMenuButton; // Serialized field for a UI button to return to the main menu
 
+    public event EventHandler OnReadyChange;
     private Dictionary<ulong, bool> playerReadyDictionary; // Dictionary to store player readiness status, with Client ID as key and readiness status as value
 
     
     
     private void Awake(){ // Awake method is called when the script instance is being loaded
 
+        Instance = this;
 
         playerReadyDictionary = new Dictionary<ulong, bool>(); // Initializing the playerReadyDictionary
 
@@ -31,10 +30,10 @@ public class CharacterSelectScript : NetworkBehaviour
 
         // Adding a listener to the mainMenuButton click event to shut down the network and return to the main menu
         mainMenuButton.onClick.AddListener(() => {
+            ClientsHandler.Instance.serverIsShuttingDown();//make sure it does nothing if the server is shutting down
+
             NetworkManager.Singleton.Shutdown(); // Shutting down the network
-            if(NetworkManager.Singleton != null){ // Checking if the NetworkManager instance exists
-                Destroy(NetworkManager.Singleton.gameObject); // Destroying the NetworkManager instance
-            }
+            
             SceneManager.LoadScene("MainMenu"); // Loading the main menu scene
         });
 
@@ -43,6 +42,8 @@ public class CharacterSelectScript : NetworkBehaviour
 
     [ServerRpc(RequireOwnership = false)] // Declaring a ServerRpc method
     private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default){ // Method to handle setting player readiness on the server
+        setPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId);
+        
         playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true; // Setting the player readiness status for the sender client to true
 
         bool allClientsReady = true; // Assuming all clients are ready initially
@@ -59,7 +60,14 @@ public class CharacterSelectScript : NetworkBehaviour
         }
     }
 
-    
+    [ClientRpc]
+    private void setPlayerReadyClientRpc(ulong clientId){
+        playerReadyDictionary[clientId] = true;
 
-    
+        OnReadyChange?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool IsPlayerReady(ulong clientId){
+        return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
+    }
 }

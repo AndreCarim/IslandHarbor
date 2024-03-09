@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 
-public class ResourceHPBar : NetworkBehaviour
+public class ResourceHPBar : MonoBehaviour
 {
     [SerializeField] private GameObject hPTopScreen; // Health bar UI
     [SerializeField] private TextMeshProUGUI hpTopScreenText; // Health bar text
@@ -15,14 +15,14 @@ public class ResourceHPBar : NetworkBehaviour
     private float previousHealthValue = float.MinValue;
 
     public void setActiveHPBar(bool value){
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
         hPTopScreen.SetActive(value);
     }
 
     // Update health bar of breakable objects
     public void setHpBar(ResourceHandler resourceHandler)
     {
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
         // Activate health bar if not already active
         if (!hPTopScreen.activeSelf)
         {
@@ -47,7 +47,7 @@ public class ResourceHPBar : NetworkBehaviour
     }
 
     public void startCoroutines(){
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
         // Animate hpTextAnimation
         StartCoroutine(AnimateHPText());
         // Shake the slider
@@ -80,7 +80,7 @@ public class ResourceHPBar : NetworkBehaviour
     }
 
     public void resetPreviousHealthValue(){
-        if(!IsOwner){return;}
+       // if(!IsOwner){return;}
         previousHealthValue = 0f;
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 
-public class ToolUIHandler : NetworkBehaviour
+public class ToolUIHandler : MonoBehaviour
 {
     [SerializeField] private Image pickAxeIsOn;
     [SerializeField] private Image axeIsOn;
@@ -20,7 +20,7 @@ public class ToolUIHandler : NetworkBehaviour
 
     public void setIsOn(int WhichUI)
     {
-        if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         pickAxeIsOn.color = new Color(pickAxeIsOn.color.r, pickAxeIsOn.color.g, pickAxeIsOn.color.b, 0f);
         axeIsOn.color = new Color(axeIsOn.color.r, axeIsOn.color.g, axeIsOn.color.b, 0f);
