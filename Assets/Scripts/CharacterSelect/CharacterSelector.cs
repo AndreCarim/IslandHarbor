@@ -11,14 +11,15 @@ public class CharacterSelector : MonoBehaviour
 
     private void Awake() {
         kickButton.onClick.AddListener(() => {
-            PlayerData playerData = ClientsHandler.Instance.getPlayerDataFromClientIndex(clientIndex);
+            PlayerData playerData = TerraNovaManager.Instance.getPlayerDataFromClientIndex(clientIndex);
 
-            ClientsHandler.Instance.kickPlayer(playerData.clientId);
+            TerraNovaManager.Instance.kickPlayer(playerData.clientId);
         });
+
     }
 
     private void Start(){
-        ClientsHandler.Instance.OnPlayerDataNetworkListChange += Instance_OnPlayerDataNetworkListChanged;
+        TerraNovaManager.Instance.OnPlayerDataNetworkListChange += Instance_OnPlayerDataNetworkListChanged;
         PlayerReadyHandler.Instance.OnReadyChange += PlayerReadyHandler_OnReadyChange;
 
         kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
@@ -34,10 +35,10 @@ public class CharacterSelector : MonoBehaviour
         updatePlayer();
     }
 
-    private void updatePlayer(){
-        if(ClientsHandler.Instance.IsClientIndexConnected(clientIndex)){
+    public void updatePlayer(){
+        if(TerraNovaManager.Instance.IsClientIndexConnected(clientIndex)){
             show();
-            PlayerData playerData = ClientsHandler.Instance.getPlayerDataFromClientIndex(clientIndex);
+            PlayerData playerData = TerraNovaManager.Instance.getPlayerDataFromClientIndex(clientIndex);
             readySign.SetActive(PlayerReadyHandler.Instance.IsPlayerReady(playerData.clientId));
         }else{
             hide();
@@ -57,6 +58,7 @@ public class CharacterSelector : MonoBehaviour
     }
 
     private void OnDestroy() {
-        ClientsHandler.Instance.OnPlayerDataNetworkListChange -= Instance_OnPlayerDataNetworkListChanged;
+        TerraNovaManager.Instance.OnPlayerDataNetworkListChange -= Instance_OnPlayerDataNetworkListChanged;
     }
+
 }

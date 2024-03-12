@@ -15,7 +15,7 @@ public class PlayerReadyHandler : NetworkBehaviour
     public event EventHandler OnReadyChange;
     private Dictionary<ulong, bool> playerReadyDictionary; // Dictionary to store player readiness status, with Client ID as key and readiness status as value
 
-    
+
     
     private void Awake(){ // Awake method is called when the script instance is being loaded
 
@@ -30,13 +30,14 @@ public class PlayerReadyHandler : NetworkBehaviour
 
         // Adding a listener to the mainMenuButton click event to shut down the network and return to the main menu
         mainMenuButton.onClick.AddListener(() => {
-            ClientsHandler.Instance.serverIsShuttingDown();//make sure it does nothing if the server is shutting down
+            TerraNovaManager.Instance.serverIsShuttingDown();//make sure it does nothing if the server is shutting down
 
             NetworkManager.Singleton.Shutdown(); // Shutting down the network
             
             SceneManager.LoadScene("MainMenu"); // Loading the main menu scene
         });
 
+       
         
     }
 
@@ -70,4 +71,6 @@ public class PlayerReadyHandler : NetworkBehaviour
     public bool IsPlayerReady(ulong clientId){
         return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
     }
+
+
 }

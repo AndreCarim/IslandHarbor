@@ -39,7 +39,7 @@ public class InGameMenuhandler : MonoBehaviour
 
 
     private void sendPlayerToMainMenu(){
-        ClientsHandler.Instance.serverIsShuttingDown();
+        TerraNovaManager.Instance.serverIsShuttingDown();
 
         NetworkManager.Singleton.Shutdown();
 

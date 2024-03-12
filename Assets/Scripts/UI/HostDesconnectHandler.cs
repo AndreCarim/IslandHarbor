@@ -19,7 +19,7 @@ public class HostDesconnectHandler : MonoBehaviour
     }
 
     private void goToMainMenu(){
-        ClientsHandler.Instance.serverIsShuttingDown();
+        TerraNovaManager.Instance.serverIsShuttingDown();
 
         NetworkManager.Singleton.Shutdown();//shut down the server
 

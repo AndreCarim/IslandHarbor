@@ -9,8 +9,8 @@ public class Cleanup : MonoBehaviour
             Destroy(NetworkManager.Singleton.gameObject);
         }
 
-        if(ClientsHandler.Instance != null){
-            Destroy(ClientsHandler.Instance.gameObject);
+        if(TerraNovaManager.Instance != null){
+            Destroy(TerraNovaManager.Instance.gameObject);
         }
     }
     

@@ -952,11 +952,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1061046717}
   - component: {fileID: 1061046715}
-  - component: {fileID: 1061046720}
-  - component: {fileID: 1061046719}
   - component: {fileID: 1061046721}
   m_Layer: 0
-  m_Name: LobbyHandler
+  m_Name: TerraNovaManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -997,34 +995,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1061046719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1061046714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28828a35e6d9349d1b6b79b4faf3e9a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  connectinUI: {fileID: 1619554022}
---- !u!114 &1061046720
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1061046714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c326b7a89cd7f48c1bbab2e6fd050ddc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WarningUI: {fileID: 252306071}
-  warningText: {fileID: 1494229241}
-  closeButton: {fileID: 261541664}
 --- !u!114 &1061046721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1034,11 +1004,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1061046714}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06cd407fefa74431a95678ce63fd3b55, type: 3}
+  m_Script: {fileID: 11500000, guid: 387a5c83ec3a74af985946431197f29e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  createGameButton: {fileID: 624047240}
-  joinGameButton: {fileID: 1997312148}
 --- !u!1 &1121272697
 GameObject:
   m_ObjectHideFlags: 0
@@ -1679,47 +1647,16 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1720043681}
-  - component: {fileID: 1720043680}
-  - component: {fileID: 1720043679}
+  - component: {fileID: 1720043682}
+  - component: {fileID: 1720043684}
+  - component: {fileID: 1720043683}
   m_Layer: 0
-  m_Name: ClientsHandler
+  m_Name: LobbyManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1720043679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1720043678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79292b871f61344b6a5c39afe00f390c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1720043680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1720043678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1793496701
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!4 &1720043681
 Transform:
   m_ObjectHideFlags: 0
@@ -1735,6 +1672,48 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1720043682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720043678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfc54528012a642f0a700210e4394d75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hostButton: {fileID: 624047240}
+  clientButton: {fileID: 1997312148}
+--- !u!114 &1720043683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720043678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c326b7a89cd7f48c1bbab2e6fd050ddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WarningUI: {fileID: 252306071}
+  warningText: {fileID: 1494229241}
+  closeButton: {fileID: 261541664}
+--- !u!114 &1720043684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720043678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28828a35e6d9349d1b6b79b4faf3e9a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectinUI: {fileID: 1619554022}
 --- !u!1 &1850362566
 GameObject:
   m_ObjectHideFlags: 0

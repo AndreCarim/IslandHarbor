@@ -7,8 +7,8 @@ public class ConnectingUI : MonoBehaviour
 
     [SerializeField] private Transform connectinUI;
     private void Start(){
-        LobbyHandler.Instance.OnTryingToJoinGame += MainMenu_OnTryingToJoinGame;
-        LobbyHandler.Instance.OnFailedToJoinGame += MainMenu_OnFailedToJoinGame;
+        TerraNovaManager.Instance.OnTryingToJoinGame += MainMenu_OnTryingToJoinGame;
+        TerraNovaManager.Instance.OnFailedToJoinGame += MainMenu_OnFailedToJoinGame;
 
         hide();
     }
@@ -30,7 +30,7 @@ public class ConnectingUI : MonoBehaviour
     }
 
     private void OnDestroy() {
-        LobbyHandler.Instance.OnTryingToJoinGame -= MainMenu_OnTryingToJoinGame;
-        LobbyHandler.Instance.OnFailedToJoinGame -= MainMenu_OnFailedToJoinGame;
+        TerraNovaManager.Instance.OnTryingToJoinGame -= MainMenu_OnTryingToJoinGame;
+        TerraNovaManager.Instance.OnFailedToJoinGame -= MainMenu_OnFailedToJoinGame;
     }
 }

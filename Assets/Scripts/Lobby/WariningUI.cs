@@ -16,7 +16,7 @@ public class WariningUI : MonoBehaviour
     } 
 
     private void Start(){
-        LobbyHandler.Instance.OnFailedToJoinGame += MainMenuHandler_OnFailedToJoinGame;
+        TerraNovaManager.Instance.OnFailedToJoinGame += MainMenuHandler_OnFailedToJoinGame;
 
         hide();
     }
@@ -46,6 +46,6 @@ public class WariningUI : MonoBehaviour
     }
 
     private void OnDestroy() {
-        LobbyHandler.Instance.OnFailedToJoinGame -= MainMenuHandler_OnFailedToJoinGame;
+        TerraNovaManager.Instance.OnFailedToJoinGame -= MainMenuHandler_OnFailedToJoinGame;
     }
 }
