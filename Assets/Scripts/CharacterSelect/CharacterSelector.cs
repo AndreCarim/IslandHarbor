@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using TMPro;
 public class CharacterSelector : MonoBehaviour
 {
     [SerializeField] private int clientIndex;
     [SerializeField] private GameObject readySign;
     [SerializeField] private Button kickButton;
+    [SerializeField] private TextMeshProUGUI playerName;
 
     private void Awake() {
         kickButton.onClick.AddListener(() => {

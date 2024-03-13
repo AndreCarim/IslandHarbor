@@ -4,8 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
-using TMPro;
 using System;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using System.Threading.Tasks;
+using Unity.Netcode.Transports.UTP;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
+using Unity.Networking.Transport.Relay;
+
 
 public class TerraNovaManager : NetworkBehaviour
 {
@@ -14,38 +21,104 @@ public class TerraNovaManager : NetworkBehaviour
     public static TerraNovaManager Instance{get; private set;}
 
     public event EventHandler OnTryingToJoinGame;
-    public event EventHandler OnFailedToJoinGame;
-
+    public event EventHandler OnFailedToJoinGame;   
+    public event EventHandler OnCreatingLobby;
     public event EventHandler OnPlayerDataNetworkListChange; // Event triggered when player data network list changes
 
     private NetworkList<PlayerData> playerDataNetworkList; // NetworkList to store player data
 
     private bool isServerShuttingDown = false;
 
+    private string relayCode;
+
 
     private void Awake(){
         DontDestroyOnLoad(gameObject); // Prevents destruction of this object when scene changes
         Instance = this;
 
+        initializeUnityAuthentication();
+
         playerDataNetworkList = new NetworkList<PlayerData>(); // Initializing player data network list
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged; // Subscribing to list changed eve
-    } 
-
-    public void startHost(){
-        //start the Host
-        NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
-        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Server_OnClientDiscconectCallback;
-        NetworkManager.Singleton.StartHost();
-        NetworkManager.Singleton.SceneManager.LoadScene("CharacterSelect", LoadSceneMode.Single);
     }
 
-    public void startClient(){
-         //start the client
-        OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+ 
 
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Client_OnClientDiscconectCallback;
-        NetworkManager.Singleton.StartClient();
+    public async void startHost(){
+        OnCreatingLobby?.Invoke(this, EventArgs.Empty);
+        try{
+            //start the alocation to the relay
+            Allocation allocation = await allocateRelay();
+
+            relayCode = await getRelayJoinCode(allocation);
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
+            //start the alocation to the relay
+
+            //start the Host
+            NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
+            NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Server_OnClientDiscconectCallback;
+            NetworkManager.Singleton.StartHost();
+            NetworkManager.Singleton.SceneManager.LoadScene("CharacterSelect", LoadSceneMode.Single);
+            //start the Host
+        }catch{
+            //show error window
+        }
+        
+    }
+
+    public  async void startClient(string clientCode){
+        OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+        try{
+            //join Relay
+            JoinAllocation joinAllocation = await joinRelay(clientCode);
+            relayCode = clientCode.ToUpper();
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+
+            //start the client
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Client_OnClientDiscconectCallback;
+            NetworkManager.Singleton.StartClient();
+        }catch(Exception e){
+            // Handle other exceptions
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+        }
+        
+    }
+
+    private async Task<JoinAllocation> joinRelay(string joinCode){
+        try{
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+            return joinAllocation;
+        }catch(RelayServiceException e){
+            Debug.Log(e);
+            return default;
+        }
+    }
+
+    private async Task<Allocation> allocateRelay(){
+        try{
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MAX_PLAYER_AMOUNT - 1);
+
+            return allocation;
+        }catch(RelayServiceException e){
+            Debug.Log(e);
+
+            return default;
+        }
+    }
+
+    private async Task<string> getRelayJoinCode(Allocation allocation){
+        try{
+            string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+            return relayJoinCode;
+        }catch(RelayServiceException e){
+            Debug.Log(e);
+
+            return default;
+        }
     }
 
     // Event handler for player data network list changes
@@ -54,7 +127,7 @@ public class TerraNovaManager : NetworkBehaviour
     }
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId){
-         playerDataNetworkList.Add(new PlayerData{
+        playerDataNetworkList.Add(new PlayerData{
             clientId = clientId,
         });
     }
@@ -143,5 +216,20 @@ public class TerraNovaManager : NetworkBehaviour
                 }
             }
         }
+    }
+
+    private async void initializeUnityAuthentication(){
+        if(UnityServices.State != ServicesInitializationState.Initialized){  
+            InitializationOptions initializationOptions = new InitializationOptions();
+            initializationOptions.SetProfile(UnityEngine.Random.Range(0, 10000).ToString());
+
+            await UnityServices.InitializeAsync(initializationOptions);
+            
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+    }
+
+    public string getRelayCode(){
+        return relayCode;
     }
 }

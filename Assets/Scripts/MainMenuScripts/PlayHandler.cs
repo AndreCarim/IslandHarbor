@@ -6,17 +6,23 @@ using UnityEngine.UI;
 
 public class PlayHandler : MonoBehaviour
 {
-    [SerializeField] private Button playButton;
+    [SerializeField] private Button multiplayerButton;
+    [SerializeField] private Button singlePlayerButton;
     [SerializeField] private Button quitButton;
 
-
     private void Start(){
-        playButton.onClick.AddListener(play);
+        multiplayerButton.onClick.AddListener(playMultiplayer);
         quitButton.onClick.AddListener(quit);
+        singlePlayerButton.onClick.AddListener(playSingleplayer);
     }
 
-    private void play(){
+    private void playMultiplayer(){
         SceneManager.LoadScene("LobbyScene");
+    }
+
+    private void playSingleplayer(){
+        //SceneManager.LoadScene("LobbyScene");
+        Debug.Log("Single player start");
     }
 
     private void quit(){

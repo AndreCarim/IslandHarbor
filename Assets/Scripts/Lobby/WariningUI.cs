@@ -25,14 +25,19 @@ public class WariningUI : MonoBehaviour
         if(!warningText)return;
 
         Show();
-       
 
-        warningText.text = NetworkManager.Singleton.DisconnectReason;
+        if(NetworkManager.Singleton.DisconnectReason != null){
+            //player connected but something happened
+             warningText.text = NetworkManager.Singleton.DisconnectReason;
 
-        if(warningText.text == ""){
-            //connection failed to connect
-            warningText.text = "Failed to connect";
+            if(warningText.text == ""){
+                //connection failed to connect
+                warningText.text = "Failed to connect";
+            }
+            
         }
+
+        warningText.text = "Failed to connect, confirm the code and try again";
     }
 
     private void Show(){
