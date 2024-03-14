@@ -16,8 +16,8 @@ using Unity.Networking.Transport.Relay;
 
 public class TerraNovaManager : NetworkBehaviour
 {
-   private const int MAX_PLAYER_AMOUNT = 4;
-
+    private const int MAX_PLAYER_AMOUNT = 4;
+    private const string PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER = "PlayernameMultiplayer";
     public static TerraNovaManager Instance{get; private set;}
 
     public event EventHandler OnTryingToJoinGame;
@@ -32,11 +32,214 @@ public class TerraNovaManager : NetworkBehaviour
     private string relayCode;
 
     public static bool playMultiplayer;
+    private string playerName;
 
+#region list with random names
+    List<string> firstName = new List<string>
+    {
+        "Barkley",
+        "Fluffy",
+        "Woofy",
+        "Paws",
+        "Snoopy",
+        "Fido",
+        "Muffin",
+        "Wiggles",
+        "Nibbles",
+        "Snuffles",
+        "Boomer",
+        "Chewie",
+        "Scrappy",
+        "Biscuit",
+        "Snickerdoodle",
+        "Squiggles",
+        "Noodle",
+        "Pickles",
+        "Bubbles",
+        "Fuzzy",
+        "Doodles",
+        "Whiskers",
+        "Puddles",
+        "Peanut",
+        "Sprinkles",
+        "Waffles",
+        "Wiggles",
+        "Buttercup",
+        "Cupcake",
+        "Gizmo",
+        "Toodles",
+        "Marshmallow",
+        "Pumpkin",
+        "Nugget",
+        "Squishy",
+        "Banjo",
+        "Noodles",
+        "Pickle",
+        "Scooter",
+        "Snickers",
+        "Twinkie",
+        "Buddy",
+        "Cuddles",
+        "Sunny",
+        "Chester",
+        "Popcorn",
+        "Mittens",
+        "Jellybean",
+        "Moochie",
+        "Peaches",
+        "Wiggles",
+        "Freckles",
+        "Squeaky",
+        "Dimples",
+        "Munchkin",
+        "Snicklefritz",
+        "Snickerdoodle",
+        "Coco",
+        "Oreo",
+        "Peanut",
+        "Sprout",
+        "Butterbean",
+        "Flapjack",
+        "Giggles",
+        "Scooter",
+        "Rascal",
+        "Bingo",
+        "Sparky",
+        "Gingersnap",
+        "Bambi",
+        "Cinnamon",
+        "Chuckles",
+        "Daffodil",
+        "Hiccup",
+        "Lulu",
+        "Pepper",
+        "Pinky",
+        "Sassafras",
+        "Squirt",
+        "Tater",
+        "Wiggles",
+        "Beanie",
+        "Bubbles",
+        "Butterscotch",
+        "Dumpling",
+        "Gumdrop",
+        "Jellybean",
+        "Muffin",
+        "Nugget",
+        "Peanut",
+        "Pickle",
+        "Pudding",
+        "Scooter",
+        "Snickerdoodle",
+        "Twinkie",
+};
+    private List<string> secondName = new List<string>
+    {
+         "Blackbeard",
+        "Swashbuckler",
+        "Jolly",
+        "Dread",
+        "Merry",
+        "Sea",
+        "Buccaneer",
+        "Pegleg",
+        "Davy",
+        "Calico",
+        "Redbeard",
+        "Scurvy",
+        "Silverhook",
+        "Stormy",
+        "Smiling",
+        "Laughing",
+        "Merrymaker",
+        "Joyful",
+        "Giggly",
+        "Laughing",
+        "Captain",
+        "Salty",
+        "Cheerful",
+        "Happy",
+        "Blissful",
+        "Chuckling",
+        "Whimsical",
+        "Chuckling",
+        "Giggling",
+        "Mirthful",
+        "Guffawing",
+        "Chuckling",
+        "Silly",
+        "Laughing",
+        "Chuckling",
+        "Joyous",
+        "Sailing",
+        "Pleasant",
+        "Grinning",
+        "Jovial",
+        "Mirthful",
+        "Sailing",
+        "Happy",
+        "Sailing",
+        "Jovial",
+        "Silly",
+        "Merry",
+        "Pleasant",
+        "Sneaky",
+        "Giggly",
+        "Whimsical",
+        "Cheerful",
+        "Silly",
+        "Laughing",
+        "Happy",
+        "Chuckling",
+        "Giggling",
+        "Jovial",
+        "Merry",
+        "Grinning",
+        "Bouncing",
+        "Squiggly",
+        "Wacky",
+        "Joyful",
+        "Playful",
+        "Ticklish",
+        "Boisterous",
+        "Silly",
+        "Chuckling",
+        "Giggling",
+        "Whimsical",
+        "Sneaky",
+        "Bouncing",
+        "Cackling",
+        "Whimsical",
+        "Silly",
+        "Giggling",
+        "Cheerful",
+        "Jovial",
+        "Wacky",
+        "Sneaky",
+        "Happy",
+        "Bouncing",
+        "Silly",
+        "Whimsical",
+        "Laughing",
+        "Jolly",
+        "Cheerful",
+        "Giggling",
+        "Boisterous",
+        "Ticklish",
+        "Sneaky",
+        "Silly",
+        "Whimsical",
+        "Chuckling",
+        "Merry",
+        "Joyful"
+    };
+    #endregion
 
     private void Awake(){
         DontDestroyOnLoad(gameObject); // Prevents destruction of this object when scene changes
         Instance = this;
+
+        playerName = PlayerPrefs.GetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, chooseRandomName());
 
         initializeUnityAuthentication();//initialize the authentication so we can use relay
 
@@ -99,6 +302,7 @@ public class TerraNovaManager : NetworkBehaviour
 
             //start the client
             NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Client_OnClientDiscconectCallback;
+            NetworkManager.Singleton.OnClientConnectedCallback += NetorkManager_Client_OnClientConnectedCallback;
             NetworkManager.Singleton.StartClient();
         }catch(Exception e){
             // Handle other exceptions
@@ -106,6 +310,20 @@ public class TerraNovaManager : NetworkBehaviour
             OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
         }
         
+    }
+
+    private void NetorkManager_Client_OnClientConnectedCallback(ulong clientId){
+        setPlayerNameServerRpc(getPlayerName());
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void setPlayerNameServerRpc(string playerName, ServerRpcParams serverRpcParams = default){
+        int playerDataIndex = getPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerName = playerName;
+        playerDataNetworkList[playerDataIndex] = playerData;
     }
 
     private async Task<JoinAllocation> joinRelay(string joinCode){
@@ -151,6 +369,8 @@ public class TerraNovaManager : NetworkBehaviour
         playerDataNetworkList.Add(new PlayerData{
             clientId = clientId,
         });
+
+        setPlayerNameServerRpc(getPlayerName());
     }
 
     private void NetorkManager_Server_OnClientDiscconectCallback(ulong clientId){
@@ -201,8 +421,26 @@ public class TerraNovaManager : NetworkBehaviour
         return clientIndex < playerDataNetworkList.Count; // Checking if client index is within the player data network list count
     }
 
-     public PlayerData getPlayerDataFromClientIndex(int clientIndex){
+    public PlayerData getPlayerDataFromClientIndex(int clientIndex){
         return playerDataNetworkList[clientIndex];
+    }
+
+    public PlayerData getPlayerDataFromClientId(ulong clientId){
+        foreach(PlayerData playerData in playerDataNetworkList){
+            if(playerData.clientId == clientId){
+                return playerData;
+            }
+        }
+        return default;
+    }
+
+    public int getPlayerDataIndexFromClientId(ulong clientId){
+        for(int i=0; i < playerDataNetworkList.Count; i++){
+            if(playerDataNetworkList[i].clientId == clientId){
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void serverIsShuttingDown(){
@@ -249,9 +487,28 @@ public class TerraNovaManager : NetworkBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
     }
+    public string chooseRandomName(){
+        // Choose a random index
+        int randomIndexFirstName = UnityEngine.Random.Range(0, firstName.Count);
+        int randomIndexSecondName = UnityEngine.Random.Range(0, secondName.Count);
 
+
+        // Retrieve the random name
+        string randomName = firstName[randomIndexFirstName] + " " + secondName[randomIndexSecondName];
+
+        return randomName;
+    }
     public string getRelayCode(){
         return relayCode;
+    }
+
+    public string getPlayerName(){
+        return playerName;
+    }
+
+    public void setPlayerName(string playerName){
+        this.playerName = playerName;
+        PlayerPrefs.SetString(PLAYER_PREFS_PLAYER_NAME_MULTIPLAYER, playerName);
     }
 
 }

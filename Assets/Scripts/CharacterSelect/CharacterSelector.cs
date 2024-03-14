@@ -9,7 +9,7 @@ public class CharacterSelector : MonoBehaviour
     [SerializeField] private int clientIndex;
     [SerializeField] private GameObject readySign;
     [SerializeField] private Button kickButton;
-    [SerializeField] private TextMeshProUGUI playerName;
+    [SerializeField] private TextMeshPro playerName;
 
     private void Awake() {
         kickButton.onClick.AddListener(() => {
@@ -40,7 +40,11 @@ public class CharacterSelector : MonoBehaviour
     public void updatePlayer(){
         if(TerraNovaManager.Instance.IsClientIndexConnected(clientIndex)){
             show();
+
             PlayerData playerData = TerraNovaManager.Instance.getPlayerDataFromClientIndex(clientIndex);
+
+            playerName.text = playerData.playerName.ToString();
+
             readySign.SetActive(PlayerReadyHandler.Instance.IsPlayerReady(playerData.clientId));
         }else{
             hide();
