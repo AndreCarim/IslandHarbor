@@ -17,12 +17,13 @@ public class PlayHandler : MonoBehaviour
     }
 
     private void playMultiplayer(){
+        TerraNovaManager.playMultiplayer = true;
         SceneManager.LoadScene("LobbyScene");
     }
 
     private void playSingleplayer(){
-        //SceneManager.LoadScene("LobbyScene");
-        Debug.Log("Single player start");
+        TerraNovaManager.playMultiplayer = false;
+        SceneManager.LoadScene("LobbyScene");
     }
 
     private void quit(){

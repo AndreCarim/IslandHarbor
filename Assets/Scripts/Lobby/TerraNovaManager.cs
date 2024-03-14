@@ -31,15 +31,24 @@ public class TerraNovaManager : NetworkBehaviour
 
     private string relayCode;
 
+    public static bool playMultiplayer;
+
 
     private void Awake(){
         DontDestroyOnLoad(gameObject); // Prevents destruction of this object when scene changes
         Instance = this;
 
-        initializeUnityAuthentication();
+        initializeUnityAuthentication();//initialize the authentication so we can use relay
 
         playerDataNetworkList = new NetworkList<PlayerData>(); // Initializing player data network list
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged; // Subscribing to list changed eve
+    }
+
+    private void Start() {
+        if(!playMultiplayer){
+            //playing in single player
+            startHost();          
+        }
     }
 
  
@@ -47,23 +56,34 @@ public class TerraNovaManager : NetworkBehaviour
     public async void startHost(){
         OnCreatingLobby?.Invoke(this, EventArgs.Empty);
         try{
-            //start the alocation to the relay
-            Allocation allocation = await allocateRelay();
+            if(playMultiplayer){
+                 //start the alocation to the relay
+                Allocation allocation = await allocateRelay();
 
-            relayCode = await getRelayJoinCode(allocation);
+                relayCode = await getRelayJoinCode(allocation);
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
-            //start the alocation to the relay
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
+                //start the alocation to the relay
+            }
+           
 
             //start the Host
             NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
             NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Server_OnClientDiscconectCallback;
             NetworkManager.Singleton.StartHost();
-            NetworkManager.Singleton.SceneManager.LoadScene("CharacterSelect", LoadSceneMode.Single);
+
+            if(playMultiplayer){
+                //if multiplayer, change to character select scene
+                NetworkManager.Singleton.SceneManager.LoadScene("CharacterSelect", LoadSceneMode.Single);
+            }else{
+                //if singleplayer, change to the main scene
+                NetworkManager.Singleton.SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+            }
             //start the Host
         }catch{
             //show error window
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
         }
         
     }
@@ -82,6 +102,7 @@ public class TerraNovaManager : NetworkBehaviour
             NetworkManager.Singleton.StartClient();
         }catch(Exception e){
             // Handle other exceptions
+            Debug.Log(e);
             OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
         }
         
@@ -232,4 +253,5 @@ public class TerraNovaManager : NetworkBehaviour
     public string getRelayCode(){
         return relayCode;
     }
+
 }
