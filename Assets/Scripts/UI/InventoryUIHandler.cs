@@ -391,7 +391,7 @@ public class InventoryUIHandler : MonoBehaviour
     }
 
     public void setPlayer(GameObject player){
-       // if(!IsOwner){return;}
+        //if(!IsOwner){return;}
 
         this.player = player;
     }

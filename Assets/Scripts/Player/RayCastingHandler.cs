@@ -19,17 +19,27 @@ public class RayCastingHandler : NetworkBehaviour
     [SerializeField] private float maxDistanceGetDroppedResource = 6.5f;
     [SerializeField] private ToolHandler toolHandler;
     [SerializeField] private GameObject player;
+    [SerializeField] private LayerMask playerLayer; //used to ignore the player
+    
 
     [SerializeField] private Color isBreakableCenterColor = new Color(0.9529f, 0.6f, 0.6f); // Assigning a light red color
     [SerializeField] private Color CollectibleResourceCenterColor = new Color(0.6039f, 0.9804f, 0.6745f); // Assigning a color close to #9FFAAC
     [SerializeField] private Color interactableColor = new Color(1f, .9f, .1f);
 
     private GameObject activeTooltip;
-    [SerializeField] private GameObject tooltipPrefab; // Prefab for the tooltip UI
+
 
     private bool canClick = true;
     private bool isAnyUIOpen = false;
 
+    //toolTip for the collectible
+    [SerializeField] private Transform tooltip;
+    [SerializeField] private TextMeshProUGUI resourceNameText;
+    [SerializeField] private TextMeshProUGUI amountText;
+    [SerializeField] private TextMeshProUGUI weightText;
+    [SerializeField] private TextMeshProUGUI totalWeightText;
+    private GameObject currentLookingObject;
+    //toolTip for the collectible
     
 
 
@@ -60,9 +70,7 @@ public class RayCastingHandler : NetworkBehaviour
             return;
         }
 
-        ClearTooltip(); // Clear any active tooltip
-
-
+        
         bool canPerformAction =  !isAnyUIOpen;
         // Cast a ray from the center of the screen to check if its hitting something
         ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
@@ -99,7 +107,7 @@ public class RayCastingHandler : NetworkBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(rayHit, out hit, maxDistanceHit)){
+        if (Physics.Raycast(rayHit, out hit, maxDistanceHit, playerLayer)){
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable")){
                 
                 ResourceHandler resourceHandler = hit.collider.GetComponent<ResourceHandler>();
@@ -124,7 +132,7 @@ public class RayCastingHandler : NetworkBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
+        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource")){
                 CollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
@@ -133,8 +141,10 @@ public class RayCastingHandler : NetworkBehaviour
                 if(hit.collider.CompareTag("Blacksmith")){
                     //its the blacksmith
                     npcUiHandler.openOrCloseBlackSmithUI();
+                }else if(hit.collider.CompareTag("Dialogue")){
+                    //open the dialogue window
+                    npcUiHandler.openOrCloseDialogue(hit.collider.gameObject, hit.collider.gameObject.GetComponent<NPCDialogueHandler>().getDialogue());
                 }
-               
                 
             }
         }
@@ -147,7 +157,7 @@ public class RayCastingHandler : NetworkBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, maxDistanceHit) )
+        if (Physics.Raycast(ray, out hit, maxDistanceHit, playerLayer) )
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable"))
             {
@@ -173,19 +183,37 @@ public class RayCastingHandler : NetworkBehaviour
     // Check for collectible resources
     private void collectibleResourceChecker(bool canPerformAction)
     {
-        if(!canPerformAction) return;
+        if (!canPerformAction) return;
 
         RaycastHit hit;
+        
 
-        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
+        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
         {
+
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource"))
             {
                 centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
-
-                DisplayTooltipResource(hit.collider.gameObject); // Display tooltip for collectible resource
-
+                if (currentLookingObject != hit.collider.gameObject)
+                {
+                    // If the player starts looking at a new collectible resource
+                    currentLookingObject = hit.collider.gameObject;
+                    setTextTo3DToolTipResource(hit.collider.gameObject.GetComponent<DroppedResource>()); // Display tooltip for collectible resource
+                    tooltip.gameObject.SetActive(true); // Activate the tooltip
+                }
             }
+            else
+            {
+                // If the player is not looking at a collectible resource
+                currentLookingObject = null;
+                tooltip.gameObject.SetActive(false); // Deactivate the tooltip
+            }
+        }
+        else
+        {
+            // If the raycast doesn't hit anything
+            currentLookingObject = null;
+            tooltip.gameObject.SetActive(false); // Deactivate the tooltip
         }
     }
     
@@ -194,7 +222,7 @@ public class RayCastingHandler : NetworkBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource))
+        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable"))
             {
@@ -250,56 +278,23 @@ public class RayCastingHandler : NetworkBehaviour
         }
     }
 
-   // Display tooltip for collectible resources
-    void DisplayTooltipResource(GameObject resourceObject)
-    {
-        DroppedResource droppedResourceScript = resourceObject.GetComponent<DroppedResource>();
-
-        // Instantiate the tooltip UI prefab
-        GameObject tooltip = Instantiate(tooltipPrefab, Vector3.zero, Quaternion.identity);
-        tooltip.SetActive(true);
-        activeTooltip = tooltip;
-
-        // Update tooltip position to be above the resourceFloating object
-        tooltip.transform.position = resourceObject.transform.position + Vector3.up * 2f;
-
-        // Calculate the direction from the resourceFloating object to the player
-        Vector3 directionToPlayer = (transform.position - resourceObject.transform.position).normalized;
-
-        // Calculate the rotation to face the player
-        Quaternion rotationToPlayer = Quaternion.LookRotation(directionToPlayer, Vector3.up);
-
-        // Apply the rotation, taking into account the current rotation of the tooltip
-        tooltip.transform.rotation = rotationToPlayer * Quaternion.Euler(0, 180, 0); // Adjust the 180 degrees to correct the rotation
-
-        setTextTo3DToolTipResource(tooltip, droppedResourceScript); // Set text for the tooltip
-        // Optional: Update tooltip content (e.g., resource type, quantity, etc.)
-    }
-
-    // Clear any active tooltip
-    void ClearTooltip()
-    {
-        Destroy(activeTooltip);
-    }
+ 
 
     // Set text for the 3D tooltip
-    private void setTextTo3DToolTipResource(GameObject toolTip, DroppedResource resource)
+    private void setTextTo3DToolTipResource(DroppedResource resource)
     {
-        TextMeshPro textMeshPro = toolTip.GetComponent<TextMeshPro>();
-        if (textMeshPro)
-        {
-            string resourceName = "<color=red>" + resource.getResource().getName() + "</color>";
-            string amountText = "<color=green>Qty: " + resource.getAmount() + "</color>";
-            string weightText = "<color=white>" + resource.getResource().getWeight().ToString() + "/" + (resource.getResource().getWeight() * resource.getAmount()).ToString()+ "</color>";
-            string instructionText = "<color=blue>Press E to collect</color>";
-            
-            textMeshPro.text = resourceName + "\n" + amountText + "\n" + weightText + "\n" + instructionText;
-        }
+        string resourceNameText = "<color=#FF9AA2>" + resource.getResource().getName() + "</color>"; // Pastel pink
+        string amountText = "<color=#77DD77>" + resource.getAmount().ToString() + "</color>"; // Pastel green
+        string weightText = "<color=#FFD700>" + resource.getResource().getWeight().ToString() + "</color>"; // Pastel gold
+        string totalWeightText = "<color=#C2B280>" + (resource.getResource().getWeight() * resource.getAmount()).ToString() + "</color>"; // Pastel brown
+
+        this.resourceNameText.text = resourceNameText;
+        this.amountText.text = amountText;
+        this.weightText.text = weightText;
+        this.totalWeightText.text = totalWeightText;
     }
 
     public void setOnStart( GameObject entirePlayerUIInstance){
-    
-
         centerUIHandlerScript = entirePlayerUIInstance.GetComponent<CenterUIHandler>();
         resourceHPBarScript = entirePlayerUIInstance.GetComponent<ResourceHPBar>();
         npcUiHandler = entirePlayerUIInstance.GetComponent<NPCUIHandler>();

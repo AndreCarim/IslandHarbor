@@ -15,8 +15,8 @@ public class CameraInput : NetworkBehaviour
     [SerializeField] private Camera firstPersonCamera;
     private float xRotation = 0f;
 
-    public float xSensitivity = 50f;
-    public float ySensitivity = 50f;
+    private float xSensitivity = 65f;
+    private float ySensitivity = 65f;
 
 
     public override void OnNetworkSpawn(){

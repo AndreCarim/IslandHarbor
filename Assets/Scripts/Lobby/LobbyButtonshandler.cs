@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
+using UnityEngine.SceneManagement;
 public class LobbyButtonshandler : MonoBehaviour
 {
     [SerializeField] private Button hostButton;
@@ -12,10 +13,15 @@ public class LobbyButtonshandler : MonoBehaviour
     [SerializeField] private Button verifyCodeButton;
     [SerializeField] private TMP_InputField inputCode;
     [SerializeField] private Button returnButtton;
+    [SerializeField] private Button mainMenuButton;
 
     private void Awake() {
         hostButton.onClick.AddListener(() => {
             TerraNovaManager.Instance.startHost();
+        });
+
+        mainMenuButton.onClick.AddListener(() => {
+            SceneManager.LoadScene("MainMenu");
         });
 
         joinButton.onClick.AddListener(showRelayWindow);

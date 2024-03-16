@@ -6,6 +6,7 @@ TagManager:
   tags:
   - EquipmentIcon
   - Blacksmith
+  - Dialogue
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - IsBreakable
   - CollectibleResource
   - Interactable
-  - 
+  - Player
   - 
   - 
   - 

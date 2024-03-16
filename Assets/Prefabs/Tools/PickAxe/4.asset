@@ -16,7 +16,7 @@ MonoBehaviour:
   Name: First pickaxe
   icon: {fileID: 21300000, guid: 8d838dae9d4fb634888c9fe42bfc3b1b, type: 3}
   id: 4
-  dropGameObject: {fileID: 4872178930830419935, guid: e5518f69ae5c14d3b9cbde37e442f840, type: 3}
+  dropGameObject: {fileID: 8234146512507840093, guid: eb3fa0c9027882b4084517c1a3342a1f, type: 3}
   goldValue: 10
   weight: 5
   informationText: awdawdwa

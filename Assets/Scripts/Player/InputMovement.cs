@@ -6,6 +6,7 @@ using Unity.Netcode;
 
 public class InputMovement : NetworkBehaviour
 {
+    [SerializeField] private GameObject playerVisual;
     private PlayerInput playerInput;
     private PlayerInput.OnFootActions onFoot;
 
@@ -20,12 +21,24 @@ public class InputMovement : NetworkBehaviour
 
     private bool isAttacking = false; // this is for the animations
 
+    [SerializeField] private Animator toolAnimator;
+    private string currentAnimationState;
+
+
+
+
+
+
+
     public override void OnNetworkSpawn(){
         if(!IsOwner) return;
 
         playerInput = new PlayerInput();
         onFoot = playerInput.OnFoot;
-        
+
+        DisableRenderersRecursively(playerVisual);
+
+
         onFoot.Jump.performed += ctx => Jump();
         controller = GetComponent<CharacterController>();
 
@@ -42,6 +55,7 @@ public class InputMovement : NetworkBehaviour
         
     }
 
+    
     
     public void ProcessMove(Vector2 input){
 
@@ -68,17 +82,61 @@ public class InputMovement : NetworkBehaviour
     public void Jump(){
         if(isGrounded && canWalk){
             playerVelocity.y = Mathf.Sqrt(jumpHeight * -3.0f * gravity); 
+
+            changeAnimationState("Jump");
         }
     }
 
-    private void setAnimation(Vector2 input){
-        if(!isAttacking){
-            if(input.x == 0 && input.y == 0){
+    private void setAnimation(Vector2 input)
+    {
+        if (!isAttacking)
+        {
+            if (input.magnitude == 0)
+            {
+                // Player idle
                 gameObject.GetComponent<ToolHandler>().changeAnimationState("Idle");
-            }else{
+                changeAnimationState("Idle");
+            }
+            else
+            {
+                // Calculate the angle between the input vector and the forward direction
+                float angle = Vector2.SignedAngle(Vector2.up, input.normalized);
+
+                // Determine movement direction based on angle
+                if (angle >= -45f && angle <= 45f)
+                {
+                    // Player walking forward
+                    changeAnimationState("RunForward");
+                }
+                else if (angle > 45f && angle <= 135f)
+                {
+                    // Player walking right
+                    changeAnimationState("RunRight");
+                }
+                else if (angle > 135f || angle <= -135f)
+                {
+                    // Player walking backward
+                    changeAnimationState("RunBackward");
+                }
+                else if (angle > -135f && angle <= -45f)
+                {
+                    // Player walking left
+                    
+                    changeAnimationState("RunLeft");
+                }
                 gameObject.GetComponent<ToolHandler>().changeAnimationState("Walking");
             }
         }
+    }
+
+    private void changeAnimationState(string newState){
+        //stop the same animation from interrupting itself
+        if (currentAnimationState == newState || !IsOwner) {return;}
+
+        //Play the animation
+        currentAnimationState = newState;
+        
+        toolAnimator.CrossFadeInFixedTime(currentAnimationState, 0.2f);
     }
 
     public void setIsAttacking(bool value){
@@ -89,7 +147,21 @@ public class InputMovement : NetworkBehaviour
         canWalk = value;
     }
 
-    
+     private void DisableRenderersRecursively(GameObject obj)
+    {
+        // Disable renderers in the current object
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.enabled = false;
+        }
+
+        // Disable renderers in child objects recursively
+        foreach (Transform child in obj.transform)
+        {
+            DisableRenderersRecursively(child.gameObject);
+        }
+    }
 
     private void OnDisable() {
         if(!IsOwner) return;
