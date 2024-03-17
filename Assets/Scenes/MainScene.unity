@@ -2224,7 +2224,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 8b914670db7a54296b373623d3b80f7a, type: 2}
     cost: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
     costAmount: 5
-    willVanishAfterPrize: 1
+    willVanishAfterPrize: 0
     willVanishAfterTalking: 0
 --- !u!136 &1356462873
 CapsuleCollider:

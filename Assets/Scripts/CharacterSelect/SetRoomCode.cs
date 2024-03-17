@@ -31,12 +31,13 @@ public class SetRoomCode : MonoBehaviour
     {
         // Activate the target object
         copiedText.SetActive(true);
-
+        copyButton.gameObject.SetActive(false);
         // Wait for the specified duration
         yield return new WaitForSeconds(duration);
 
         // Deactivate the target object
         copiedText.SetActive(false);
+        copyButton.gameObject.SetActive(true);
         canCopy = true;
     }
     

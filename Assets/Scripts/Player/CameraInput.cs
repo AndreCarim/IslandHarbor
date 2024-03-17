@@ -15,8 +15,10 @@ public class CameraInput : NetworkBehaviour
     [SerializeField] private Camera firstPersonCamera;
     private float xRotation = 0f;
 
-    private float xSensitivity = 65f;
-    private float ySensitivity = 65f;
+    private float xSensitivity;
+    private float ySensitivity;
+
+    private const string MOUSE_SENSITIVITY_KEY = "MouseSensitivity";
 
 
     public override void OnNetworkSpawn(){
@@ -24,6 +26,9 @@ public class CameraInput : NetworkBehaviour
 
         base.OnNetworkSpawn();
         initialize();
+
+        float savedSensitivity = PlayerPrefs.GetFloat(MOUSE_SENSITIVITY_KEY, 5f);
+        setMouseSensitivity(savedSensitivity);
 
         playerInput = new PlayerInput();
         onFoot = playerInput.OnFoot;
@@ -93,5 +98,18 @@ public class CameraInput : NetworkBehaviour
         if(!IsOwner) return;
         Cursor.lockState = CursorLockMode.None;
         onFoot.Disable();
+    }
+
+    public void setMouseSensitivity(float newValue){
+        xSensitivity = newValue;
+        ySensitivity = newValue;
+
+        // Save the mouse sensitivity value to PlayerPrefs
+        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, newValue);
+        PlayerPrefs.Save(); // Save the PlayerPrefs data immediately
+    }
+
+    public float getMouseSensitivy(){
+        return xSensitivity;
     }
 }

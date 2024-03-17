@@ -277,7 +277,7 @@ public class InventoryUIHandler : MonoBehaviour
             // Start shaking the slot
             if (slot != null)
             {
-                StartShaking();
+                //StartShaking();
                 setItemInformation(resourceSelected, true, amount, isEquipped);
             }
 
