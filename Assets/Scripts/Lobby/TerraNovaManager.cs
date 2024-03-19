@@ -370,6 +370,7 @@ public class TerraNovaManager : NetworkBehaviour
             clientId = clientId,
         });
 
+        
         setPlayerNameServerRpc(getPlayerName());
     }
 

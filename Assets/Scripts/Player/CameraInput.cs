@@ -101,6 +101,7 @@ public class CameraInput : NetworkBehaviour
     }
 
     public void setMouseSensitivity(float newValue){
+        if(!IsOwner)return;
         xSensitivity = newValue;
         ySensitivity = newValue;
 

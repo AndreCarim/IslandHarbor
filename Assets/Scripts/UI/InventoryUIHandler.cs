@@ -326,11 +326,11 @@ public class InventoryUIHandler : MonoBehaviour
         // Stop the previous shaking coroutine if it's running
         if (shakeCoroutine != null)
         {
-            StopCoroutine(shakeCoroutine);
+            //StopCoroutine(shakeCoroutine);
         }
 
         // Start a new coroutine for the current button
-        shakeCoroutine = StartCoroutine(ShakeCoroutine());
+        //shakeCoroutine = StartCoroutine(ShakeCoroutine());
     }
     
 

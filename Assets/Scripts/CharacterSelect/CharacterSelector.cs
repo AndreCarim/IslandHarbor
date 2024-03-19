@@ -24,7 +24,19 @@ public class CharacterSelector : MonoBehaviour
         TerraNovaManager.Instance.OnPlayerDataNetworkListChange += Instance_OnPlayerDataNetworkListChanged;
         PlayerReadyHandler.Instance.OnReadyChange += PlayerReadyHandler_OnReadyChange;
 
-        kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
+
+        // Check if the local player is the server
+        if (NetworkManager.Singleton.IsServer )
+        {
+            if(clientIndex == 0){
+                //its the server/host
+                kickButton.gameObject.SetActive(false);
+            }else{
+                kickButton.gameObject.SetActive(true);
+            }
+        }else{
+            kickButton.gameObject.SetActive(false);
+        }
 
         updatePlayer();
     }

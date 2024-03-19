@@ -26,6 +26,8 @@ public class PlayerReadyHandler : NetworkBehaviour
         // Adding a listener to the readyButton click event to call SetPlayerReadyServerRpc method
         readyButton.onClick.AddListener(() => {
             SetPlayerReadyServerRpc();
+
+            readyButton.gameObject.SetActive(false);
         }); 
 
         // Adding a listener to the mainMenuButton click event to shut down the network and return to the main menu
@@ -38,8 +40,30 @@ public class PlayerReadyHandler : NetworkBehaviour
         });
 
        
-        
+        TerraNovaManager.Instance.OnPlayerDataNetworkListChange += Instance_OnPlayerDataNetworkListChanged;
     }
+
+    private void Instance_OnPlayerDataNetworkListChanged(object sender, System.EventArgs e){
+        //this will be called when a player joins or get out of the room
+        //so all the players need to press ready again. 
+        clearDictionaryServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void clearDictionaryServerRpc(ServerRpcParams serverRpcParams = default){
+        playerReadyDictionary.Clear();
+
+        clearDictionaryOnClientRpc();
+    }
+
+    [ClientRpc]
+    private void clearDictionaryOnClientRpc(){
+        playerReadyDictionary.Clear();
+
+        readyButton.gameObject.SetActive(true);
+    }
+
+
 
     [ServerRpc(RequireOwnership = false)] // Declaring a ServerRpc method
     private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default){ // Method to handle setting player readiness on the server
@@ -47,6 +71,7 @@ public class PlayerReadyHandler : NetworkBehaviour
         
         playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true; // Setting the player readiness status for the sender client to true
 
+        
         bool allClientsReady = true; // Assuming all clients are ready initially
         foreach(ulong clientId in NetworkManager.Singleton.ConnectedClientsIds){ // Iterating through connected client IDs
             if(!playerReadyDictionary.ContainsKey(clientId) || !playerReadyDictionary[clientId]){
@@ -71,6 +96,10 @@ public class PlayerReadyHandler : NetworkBehaviour
     public bool IsPlayerReady(ulong clientId){
         return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
     }
-
-
+     public override void OnDestroy()
+    {
+        base.OnDestroy(); // Call the base class implementation
+        TerraNovaManager.Instance.OnPlayerDataNetworkListChange -= Instance_OnPlayerDataNetworkListChanged;
+    }
+   
 }

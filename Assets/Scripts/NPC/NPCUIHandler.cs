@@ -31,6 +31,7 @@ public class NPCUIHandler : MonoBehaviour
             blackSmithUI.SetActive(true);
             player.GetComponent<RayCastingHandler>().setIsAnyUIOpen(true);
 
+            blackSmithUIHandlerScript.openUI();
             setConfig(false);
 
         }
