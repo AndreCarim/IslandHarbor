@@ -134,8 +134,8 @@ public class RayCastingHandler : NetworkBehaviour
 
         if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource")){
-                CollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("DroppedCollectibleResource")){
+                DroppedCollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
             }else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable")){
                  //if the player is looking at an Interactable and clicks E
                 if(hit.collider.CompareTag("Blacksmith")){
@@ -146,6 +146,8 @@ public class RayCastingHandler : NetworkBehaviour
                     npcUiHandler.openOrCloseDialogue(hit.collider.gameObject, hit.collider.gameObject.GetComponent<NPCDialogueHandler>().getDialogue());
                 }
                 
+            }else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("NativeCollectibleResource")){
+                NativeCollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
             }
         }
     }
@@ -183,26 +185,46 @@ public class RayCastingHandler : NetworkBehaviour
     // Check for collectible resources
     private void collectibleResourceChecker(bool canPerformAction)
     {
+       
         if (!canPerformAction) return;
 
         RaycastHit hit;
         
-
         if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
         {
-
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CollectibleResource"))
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("DroppedCollectibleResource"))
             {
                 centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
                 if (currentLookingObject != hit.collider.gameObject)
                 {
                     // If the player starts looking at a new collectible resource
+                    DroppedResource droppedResource = hit.collider.gameObject.GetComponent<DroppedResource>();
+
                     currentLookingObject = hit.collider.gameObject;
-                    setTextTo3DToolTipResource(hit.collider.gameObject.GetComponent<DroppedResource>()); // Display tooltip for collectible resource
+
+                    if(droppedResource){
+                        //its a collectble dropped from a resource
+                        setTextTo3DToolTipResourceDropped(hit.collider.gameObject.GetComponent<DroppedResource>()); // Display tooltip for collectible resource
+                    }
                     tooltip.gameObject.SetActive(true); // Activate the tooltip
                 }
             }
-            else
+            else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("NativeCollectibleResource")){
+                centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
+                if (currentLookingObject != hit.collider.gameObject)
+                {
+                    // If the player starts looking at a new collectible resource
+                    ResourceHandler resourceHandler = hit.collider.gameObject.GetComponent<ResourceHandler>();
+
+                    currentLookingObject = hit.collider.gameObject;
+
+                    if(resourceHandler){
+                        //its a collectble dropped from a resource
+                        setTextTo3DToolTipResourceNative(hit.collider.gameObject.GetComponent<ResourceHandler>()); // Display tooltip for collectible resource
+                    }
+                    tooltip.gameObject.SetActive(true); // Activate the tooltip
+                }
+            }else
             {
                 // If the player is not looking at a collectible resource
                 currentLookingObject = null;
@@ -250,7 +272,7 @@ public class RayCastingHandler : NetworkBehaviour
             yield return null;
         }
         gameObject.GetComponent<InputMovement>().setIsAttacking(false);
-       centerUIHandlerScript.endCooldownSlider();
+        centerUIHandlerScript.endCooldownSlider();
 
         // Reset the canClick flag after the cooldown
         canClick = true;
@@ -264,7 +286,7 @@ public class RayCastingHandler : NetworkBehaviour
     }
 
     // Collectible resource function to add resources to the player inventory
-    private void CollectibleResourceFunction(GameObject collectibleResource)
+    private void DroppedCollectibleResourceFunction(GameObject collectibleResource)
     {
         bool collected = false;//debounce
 
@@ -274,19 +296,50 @@ public class RayCastingHandler : NetworkBehaviour
             // Access the ResourceInventory component of the player and add the resource
             DroppedResource droppedResourceScript = collectibleResource.GetComponent<DroppedResource>();
 
+            //its a dropped resource like a 
             player.GetComponent<ResourceInventory>().AddResource(droppedResourceScript.getResource(), droppedResourceScript.getAmount(), collectibleResource);
+
+        }
+    }
+
+    private void NativeCollectibleResourceFunction(GameObject collectibleResource){
+        bool collected = false;//debounce
+
+        if (collected == false)
+        {
+            collected = true;
+            // Access the ResourceInventory component of the player and add the resource
+            ResourceHandler resourceHandlerScript = collectibleResource.GetComponent<ResourceHandler>();
+
+            //its a dropped resource like a 
+            player.GetComponent<ResourceInventory>().AddResource(resourceHandlerScript.getResourceDrop(), resourceHandlerScript.getRandomAmount(), collectibleResource);
+
         }
     }
 
  
 
     // Set text for the 3D tooltip
-    private void setTextTo3DToolTipResource(DroppedResource resource)
+    private void setTextTo3DToolTipResourceDropped(DroppedResource resource)
     {
+        if(resource == null) return;
         string resourceNameText = "<color=#FF9AA2>" + resource.getResource().getName() + "</color>"; // Pastel pink
         string amountText = "<color=#77DD77>" + resource.getAmount().ToString() + "</color>"; // Pastel green
         string weightText = "<color=#FFD700>" + resource.getResource().getWeight().ToString() + "</color>"; // Pastel gold
         string totalWeightText = "<color=#C2B280>" + (resource.getResource().getWeight() * resource.getAmount()).ToString() + "</color>"; // Pastel brown
+
+        this.resourceNameText.text = resourceNameText;
+        this.amountText.text = amountText;
+        this.weightText.text = weightText;
+        this.totalWeightText.text = totalWeightText;
+    }
+
+    private void setTextTo3DToolTipResourceNative(ResourceHandler resource){
+        if(resource == null) return;
+        string resourceNameText = "<color=#FF9AA2>" + resource.getName() + "</color>"; // Pastel pink
+        string amountText = "<color=#77DD77>" + resource.getRandomAmount().ToString() + "</color>"; // Pastel green
+        string weightText = "<color=#FFD700>" + resource.getResourceDrop().getWeight().ToString() + "</color>"; // Pastel gold
+        string totalWeightText = "<color=#C2B280>" + (resource.getResourceDrop().getWeight() * resource.getRandomAmount()).ToString() + "</color>"; // Pastel brown
 
         this.resourceNameText.text = resourceNameText;
         this.amountText.text = amountText;

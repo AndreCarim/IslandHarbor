@@ -5,6 +5,8 @@ using Unity.Netcode;
 
 public class ResourceHandler : NetworkBehaviour
 {
+
+    [SerializeField] private string resourceName;
     [SerializeField] private double startHealth;
     [SerializeField] private NetworkVariable<double> currentHealth = new NetworkVariable<double>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -16,9 +18,10 @@ public class ResourceHandler : NetworkBehaviour
     [SerializeField] private int amountDropFrom = 1;
     [SerializeField] private int amountDropTo = 1;   
 
-    [SerializeField] private ResourceEnum.ResourceType toolType;
+    [SerializeField] private ResourceEnum.ResourceType ToolBonus;
 
 
+    [SerializeField] private NetworkVariable<int> randomAmountToDrop = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     
 
     private Renderer resourceRenderer; // Reference to the resource renderer
@@ -26,16 +29,8 @@ public class ResourceHandler : NetworkBehaviour
     public override void OnNetworkSpawn(){
         if(IsServer){currentHealth.Value = startHealth;}
 
-         // Attempt to get the Renderer component from the same GameObject
-        resourceRenderer = GetComponent<Renderer>();
-
-        if (resourceRenderer == null)
-        {
-            Debug.LogError("ResourceHandler: Resource Renderer not found on the same GameObject!");
-        }
-        else
-        {
-            defaultMaterial = resourceRenderer.material;
+        if(IsServer){
+            randomAmountToDrop.Value = Random.Range(amountDropFrom, amountDropTo + 1);
         }
     }
 
@@ -44,7 +39,7 @@ public class ResourceHandler : NetworkBehaviour
     {      
         if (currentHealth.Value >= 0)
         {
-            if (toolTypeUsed == toolType)
+            if (toolTypeUsed == ToolBonus)
             {
                 setNewHealthServerRpc(damageAmount);
             }
@@ -52,7 +47,6 @@ public class ResourceHandler : NetworkBehaviour
             {
                 setNewHealthServerRpc(damageAmount/2);
             }
-            StartCoroutine(Effects());
         }
     }
 
@@ -71,8 +65,7 @@ public class ResourceHandler : NetworkBehaviour
         if (currentHealth.Value <= 0)
         {
             // Resource died
-            // Get a random number between amountDropFrom (inclusive) and amountDropTo (exclusive)
-            int randomAmount = Random.Range(amountDropFrom, amountDropTo + 1);
+            
 
             // Get the collider of the original GameObject
             Collider collider = GetComponent<Collider>();
@@ -90,7 +83,7 @@ public class ResourceHandler : NetworkBehaviour
                 if (!float.IsNaN(center.x) && !float.IsNaN(center.y) && !float.IsNaN(center.z))
                 {
                     
-                    dropItem(center, randomAmount);
+                    dropItem(center, randomAmountToDrop.Value);
                     // Enable colliders after instantiation
                     collider.enabled = true;
 
@@ -189,47 +182,7 @@ public class ResourceHandler : NetworkBehaviour
         }
     }
 
-    IEnumerator Effects()
-    {
-        if (resourceRenderer != null)
-        {
-            // Store the original color and position
-            Color originalColor = resourceRenderer.material.color;
-            Vector3 originalPosition = transform.position;
-
-            // Apply blink material with semi-transparent white color
-            resourceRenderer.material = blinkMaterial;
-            resourceRenderer.material.color = new Color(1f, .5f, .4f, 0f); // Adjust the alpha value for transparency
-
-            // Shake parameters
-            float shakeDuration = 0.15f; // Adjust the duration of the shaking
-            float shakeMagnitude = 0.5f; // Adjust the magnitude of the shaking
-
-            float elapsed = 0f;
-
-            while (elapsed < shakeDuration)
-            {
-                // Calculate the amount of shaking
-                float x = originalPosition.x + Random.Range(-1f, 1f) * shakeMagnitude;
-                float y = originalPosition.y + Random.Range(-1f, 1f) * shakeMagnitude;
-
-                // Apply the shaking to the object's position
-                transform.position = new Vector3(x, y, originalPosition.z);
-
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            // Revert to the default material, original color, and position
-            resourceRenderer.material = defaultMaterial;
-            resourceRenderer.material.color = originalColor;
-            transform.position = originalPosition;
-        }
-        else
-        {
-            Debug.LogError("ResourceHandler: Resource Renderer not found on the same GameObject!");
-        }
-    }
+    
 
     public double getStartHealth(){
         return startHealth;
@@ -240,9 +193,14 @@ public class ResourceHandler : NetworkBehaviour
     }
 
     public string getName(){
-        return resourceDrop.getName();
+        return resourceName;
     }
 
-    
+    public int getRandomAmount(){
+        return randomAmountToDrop.Value;
+    }
 
+    public ResourceGenericHandler getResourceDrop(){
+        return resourceDrop;
+    }
 }

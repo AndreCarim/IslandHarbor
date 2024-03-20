@@ -16,10 +16,10 @@ TagManager:
   - UI
   - Ground
   - IsBreakable
-  - CollectibleResource
+  - DroppedCollectibleResource
   - Interactable
   - Player
-  - 
+  - NativeCollectibleResource
   - 
   - 
   - 

@@ -96,7 +96,7 @@ public class PlayerReadyHandler : NetworkBehaviour
     public bool IsPlayerReady(ulong clientId){
         return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
     }
-     public override void OnDestroy()
+    public override void OnDestroy()
     {
         base.OnDestroy(); // Call the base class implementation
         TerraNovaManager.Instance.OnPlayerDataNetworkListChange -= Instance_OnPlayerDataNetworkListChanged;

@@ -79,17 +79,20 @@ public class CameraInput : NetworkBehaviour
     public void setIsFreeToLook(bool value)
     {
         if(!IsOwner)return;
-
-        isFreeToLook = value;
-
+        
         if (value)
         {
+            // Hide and lock the cursor
+            Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
         else
         {
+            // Make the cursor visible and unlock it
+            Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
+        isFreeToLook = value;
     }
 
     

@@ -12,6 +12,7 @@ public class Cleanup : MonoBehaviour
         if(TerraNovaManager.Instance != null){
             Destroy(TerraNovaManager.Instance.gameObject);
         }
+
     }
     
 }

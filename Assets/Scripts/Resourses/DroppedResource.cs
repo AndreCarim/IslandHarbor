@@ -25,7 +25,7 @@ public class DroppedResource : NetworkBehaviour
         
 
          // Change the layer to "ResourceFloating"
-        gameObject.layer = LayerMask.NameToLayer("CollectibleResource");
+        gameObject.layer = LayerMask.NameToLayer("DroppedCollectibleResource");
         
     }
 
