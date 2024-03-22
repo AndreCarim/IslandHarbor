@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1433470151137264332}
   - component: {fileID: 7698999670428813987}
   - component: {fileID: 8627955323073586302}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: BackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -85,7 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2569598979550337351}
   - component: {fileID: 5736095147079614145}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: ToolTip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1039.2615, y: 508.7655}
+  m_AnchoredPosition: {x: 1039.2615, y: 508.76556}
   m_SizeDelta: {x: 158.51898, y: 81.234985}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &5736095147079614145
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 4066150691453372181}
   - component: {fileID: 3428325725918224966}
   - component: {fileID: 4467351462186152441}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: ResourceName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -188,8 +188,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Wood
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dc2cc93475f76427c86a8262bee36b88, type: 2}
-  m_sharedMaterial: {fileID: 2269793554123077917, guid: dc2cc93475f76427c86a8262bee36b88, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f58c05479cb14f588efcdfcbdab347c, type: 2}
+  m_sharedMaterial: {fileID: 7423409246693961632, guid: 5f58c05479cb14f588efcdfcbdab347c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

@@ -18,6 +18,9 @@ public class CameraInput : NetworkBehaviour
     private float xSensitivity;
     private float ySensitivity;
 
+    private float smoothSpeed = 20f;
+    private Vector2 smoothInput;
+
     private const string MOUSE_SENSITIVITY_KEY = "MouseSensitivity";
 
 
@@ -64,8 +67,11 @@ public class CameraInput : NetworkBehaviour
 
     public void ProcessLook(Vector2 input){
         if(isFreeToLook){
-            float mouseX = input.x;
-            float mouseY = input.y;
+            // Smooth the input using linear interpolation
+            smoothInput = Vector2.Lerp(smoothInput, input, smoothSpeed * Time.deltaTime);
+
+            float mouseX = smoothInput.x;
+            float mouseY = smoothInput.y;
 
             xRotation -= (mouseY * Time.deltaTime) * ySensitivity;
             xRotation = Mathf.Clamp(xRotation, -80f, 80f);

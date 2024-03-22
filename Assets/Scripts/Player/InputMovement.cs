@@ -25,7 +25,7 @@ public class InputMovement : NetworkBehaviour
     private string currentAnimationState;
 
 
-
+  public float maxVelocityUpdate = 10f;
 
 
 
@@ -57,27 +57,39 @@ public class InputMovement : NetworkBehaviour
 
     
     
-    public void ProcessMove(Vector2 input){
-
-        if(isGrounded && playerVelocity.y < 0){
-            playerVelocity.y = -2;
+    private void ProcessMove(Vector2 input) {
+        if (isGrounded && playerVelocity.y < 0) {
+            playerVelocity.y = -2f; // Reset vertical velocity when grounded
         }
 
-        if(canWalk == true){
-            Vector3 moveDirection = Vector3.zero;
-            moveDirection.x = input.x;
-            moveDirection.z = input.y;
+        if (canWalk) {
+            // Calculate target velocity based on input and desired speed
+            Vector3 moveDirection = transform.TransformDirection(new Vector3(input.x, 0, input.y));
+            Vector3 targetVelocity = moveDirection * speed;
 
-            controller.Move(transform.TransformDirection(moveDirection) * speed * Time.deltaTime);
-        
+            // Calculate the change in velocity required to reach the target velocity
+            Vector3 velocityUpdate = (targetVelocity - playerVelocity);
+
+            // Clamp the velocity change to a maximum value
+            velocityUpdate.x = Mathf.Clamp(velocityUpdate.x, -maxVelocityUpdate, maxVelocityUpdate);
+            velocityUpdate.z = Mathf.Clamp(velocityUpdate.z, -maxVelocityUpdate, maxVelocityUpdate);
+            velocityUpdate.y = 0;
+
+            // Update the player's velocity directly
+            playerVelocity += velocityUpdate;
+        } else {
+            // If cannot walk, set horizontal velocity to zero to stop movement
+            playerVelocity.x = 0;
+            playerVelocity.z = 0;
         }
 
+        // Apply gravity
         playerVelocity.y += gravity * Time.deltaTime;
 
+        // Move the player using the character controller
         controller.Move(playerVelocity * Time.deltaTime);
-
-        
     }
+
 
     public void Jump(){
         if(isGrounded && canWalk){

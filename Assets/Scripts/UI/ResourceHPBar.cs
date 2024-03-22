@@ -16,7 +16,16 @@ public class ResourceHPBar : MonoBehaviour
 
     public void setActiveHPBar(bool value){
         //if(!IsOwner){return;}
-        hPTopScreen.SetActive(value);
+
+        if(value){
+            if(!hPTopScreen.activeSelf){
+                hPTopScreen.SetActive(value);
+            }
+        }else{
+            if(hPTopScreen.activeSelf){
+                hPTopScreen.SetActive(value);
+            }
+        }
     }
 
     // Update health bar of breakable objects

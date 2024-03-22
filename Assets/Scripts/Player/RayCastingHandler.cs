@@ -15,8 +15,7 @@ public class RayCastingHandler : NetworkBehaviour
     private PlayerInput playerInput;
     private PlayerInput.OnFootActions onFoot;
 
-    [SerializeField] private float maxDistanceHit = 4.5f;
-    [SerializeField] private float maxDistanceGetDroppedResource = 6.5f;
+    [SerializeField] private float maxDistanceToInteract = 5.5f;
     [SerializeField] private ToolHandler toolHandler;
     [SerializeField] private GameObject player;
     [SerializeField] private LayerMask playerLayer; //used to ignore the player
@@ -38,6 +37,7 @@ public class RayCastingHandler : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI amountText;
     [SerializeField] private TextMeshProUGUI weightText;
     [SerializeField] private TextMeshProUGUI totalWeightText;
+    [SerializeField] private Transform pressEToInteract;
     private GameObject currentLookingObject;
     //toolTip for the collectible
     
@@ -74,11 +74,36 @@ public class RayCastingHandler : NetworkBehaviour
         bool canPerformAction =  !isAnyUIOpen;
         // Cast a ray from the center of the screen to check if its hitting something
         ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
+        RaycastHit hit;
 
-         // Change Color and show hp if needed
-        isBreakableChecker(canPerformAction);
-        collectibleResourceChecker(canPerformAction);
-        isInteractable(canPerformAction);
+        if (Physics.Raycast(ray, out hit, maxDistanceToInteract, playerLayer) && canPerformAction){
+            isBreakableChecker(canPerformAction, hit);
+            collectibleResourceChecker(canPerformAction, hit);
+            isInteractable(canPerformAction, hit);
+        }else
+        {
+            //reset when not looking to the right layers
+            
+            // If the raycast doesn't hit anything
+            currentLookingObject = null;
+
+            //collectibleResourceChecker
+            if(tooltip.gameObject.activeSelf){
+                tooltip.gameObject.SetActive(false); // Deactivate the tooltip
+            }
+
+
+            //isBreakable
+            resourceHPBarScript.setActiveHPBar(false); // Deactivate health bar when no hit is detected
+            centerUIHandlerScript.setCenterDotColor(Color.white); // Set center dot color to default
+            resourceHPBarScript.resetPreviousHealthValue();
+
+
+            //isInteractable
+            if(pressEToInteract.gameObject.activeSelf){
+                pressEToInteract.gameObject.SetActive(false);
+            }
+        }
 
         if(onFoot.LMClick.IsPressed()){LMClick();}
 
@@ -103,11 +128,10 @@ public class RayCastingHandler : NetworkBehaviour
 
     private void LMClickHandler(){
          //this is the rayCasting that will check if at half the couroutine the player was ainming to something
-        Ray rayHit = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f)); // Center of the screen
 
         RaycastHit hit;
 
-        if (Physics.Raycast(rayHit, out hit, maxDistanceHit, playerLayer)){
+        if (Physics.Raycast(ray, out hit, maxDistanceToInteract, playerLayer)){
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable")){
                 
                 ResourceHandler resourceHandler = hit.collider.GetComponent<ResourceHandler>();
@@ -132,20 +156,19 @@ public class RayCastingHandler : NetworkBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
+        if (Physics.Raycast(ray, out hit, maxDistanceToInteract, playerLayer))
         {
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("DroppedCollectibleResource")){
-                DroppedCollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
+                DroppedCollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press       
             }else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable")){
-                 //if the player is looking at an Interactable and clicks E
+                //if the player is looking at an Interactable and clicks E
                 if(hit.collider.CompareTag("Blacksmith")){
                     //its the blacksmith
                     npcUiHandler.openOrCloseBlackSmithUI();
                 }else if(hit.collider.CompareTag("Dialogue")){
                     //open the dialogue window
                     npcUiHandler.openOrCloseDialogue(hit.collider.gameObject, hit.collider.gameObject.GetComponent<NPCDialogueHandler>().getDialogue());
-                }
-                
+                }              
             }else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("NativeCollectibleResource")){
                 NativeCollectibleResourceFunction(hit.collider.gameObject); // Collect resource on 'E' key press
             }
@@ -153,105 +176,98 @@ public class RayCastingHandler : NetworkBehaviour
     }
 
     // Check for breakable objects
-    private void isBreakableChecker(bool canPerformAction)
+    private void isBreakableChecker(bool canPerformAction, RaycastHit hit)
     {
         if(!canPerformAction) return;
-
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, maxDistanceHit, playerLayer) )
+       
+        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable"))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("IsBreakable"))
-            {
-                ResourceHandler resourceHandler = hit.collider.GetComponent<ResourceHandler>();
+            ResourceHandler resourceHandler = hit.collider.GetComponent<ResourceHandler>();
                 
-                resourceHPBarScript.setHpBar(resourceHandler); // Update health bar
-                centerUIHandlerScript.setCenterDotColor(isBreakableCenterColor);
-            }
-            else
-            {
-                resourceHPBarScript.setActiveHPBar(false);// Deactivate health bar for non-breakable objects
-            }
+            resourceHPBarScript.setHpBar(resourceHandler); // Update health bar
+            centerUIHandlerScript.setCenterDotColor(isBreakableCenterColor);
         }
         else
         {
-            // If not hitting anything
-            resourceHPBarScript.setActiveHPBar(false); // Deactivate health bar when no hit is detected
-            centerUIHandlerScript.setCenterDotColor(Color.white); // Set center dot color to default
-            resourceHPBarScript.resetPreviousHealthValue();
+            resourceHPBarScript.setActiveHPBar(false);// Deactivate health bar for non-breakable objects
         }
+       
     }
 
     // Check for collectible resources
-    private void collectibleResourceChecker(bool canPerformAction)
+    private void collectibleResourceChecker(bool canPerformAction, RaycastHit hit)
     {
        
         if (!canPerformAction) return;
 
-        RaycastHit hit;
-        
-        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
+
+       
+        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("DroppedCollectibleResource"))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("DroppedCollectibleResource"))
+            centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
+            if (currentLookingObject != hit.collider.gameObject)
             {
-                centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
-                if (currentLookingObject != hit.collider.gameObject)
-                {
-                    // If the player starts looking at a new collectible resource
-                    DroppedResource droppedResource = hit.collider.gameObject.GetComponent<DroppedResource>();
+                // If the player starts looking at a new collectible resource
+                DroppedResource droppedResource = hit.collider.gameObject.GetComponent<DroppedResource>();
 
-                    currentLookingObject = hit.collider.gameObject;
+                currentLookingObject = hit.collider.gameObject;
 
-                    if(droppedResource){
+                if(droppedResource){
                         //its a collectble dropped from a resource
-                        setTextTo3DToolTipResourceDropped(hit.collider.gameObject.GetComponent<DroppedResource>()); // Display tooltip for collectible resource
-                    }
+                    setTextTo3DToolTipResourceDropped(hit.collider.gameObject.GetComponent<DroppedResource>()); // Display tooltip for collectible resource
+                }
+
+                if(!tooltip.gameObject.activeSelf){
                     tooltip.gameObject.SetActive(true); // Activate the tooltip
                 }
             }
-            else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("NativeCollectibleResource")){
-                centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
-                if (currentLookingObject != hit.collider.gameObject)
-                {
+        }
+        else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("NativeCollectibleResource")){
+            centerUIHandlerScript.setCenterDotColor(CollectibleResourceCenterColor); // Set center dot color for collectible resources
+            if (currentLookingObject != hit.collider.gameObject)
+            {
                     // If the player starts looking at a new collectible resource
-                    ResourceHandler resourceHandler = hit.collider.gameObject.GetComponent<ResourceHandler>();
+                ResourceHandler resourceHandler = hit.collider.gameObject.GetComponent<ResourceHandler>();
 
-                    currentLookingObject = hit.collider.gameObject;
+                currentLookingObject = hit.collider.gameObject;
 
-                    if(resourceHandler){
+                if(resourceHandler){
                         //its a collectble dropped from a resource
-                        setTextTo3DToolTipResourceNative(hit.collider.gameObject.GetComponent<ResourceHandler>()); // Display tooltip for collectible resource
-                    }
+                    setTextTo3DToolTipResourceNative(hit.collider.gameObject.GetComponent<ResourceHandler>()); // Display tooltip for collectible resource
+                }
+
+                if(!tooltip.gameObject.activeSelf){
                     tooltip.gameObject.SetActive(true); // Activate the tooltip
                 }
-            }else
-            {
-                // If the player is not looking at a collectible resource
-                currentLookingObject = null;
+            }
+        }else
+        {
+            // If the player is not looking at a collectible resource
+            currentLookingObject = null;
+
+            if(tooltip.gameObject.activeSelf){
                 tooltip.gameObject.SetActive(false); // Deactivate the tooltip
             }
         }
-        else
-        {
-            // If the raycast doesn't hit anything
-            currentLookingObject = null;
-            tooltip.gameObject.SetActive(false); // Deactivate the tooltip
-        }
+        
+        
     }
     
-    private void isInteractable(bool canPerformAction){
+    private void isInteractable(bool canPerformAction, RaycastHit hit){
         if(!canPerformAction) return;
 
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, maxDistanceGetDroppedResource, playerLayer))
+        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable"))
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable"))
-            {
-                centerUIHandlerScript.setCenterDotColor(interactableColor); // Set center dot color for collectible resources
+            centerUIHandlerScript.setCenterDotColor(interactableColor); // Set center dot color for collectible resources
+
+            if(!pressEToInteract.gameObject.activeSelf){
+                pressEToInteract.gameObject.SetActive(true);
+            }
+        }else{
+            if(pressEToInteract.gameObject.activeSelf){
+                pressEToInteract.gameObject.SetActive(false);
             }
         }
-
     }
 
     

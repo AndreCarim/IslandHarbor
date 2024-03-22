@@ -15,9 +15,9 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
   m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_FogColor: {r: 0.023584902, g: 1, b: 0.95018643, a: 0.99215686}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.0045
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -582,7 +582,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -824,7 +824,7 @@ Transform:
   m_GameObject: {fileID: 178071149}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.9000015, y: 0, z: -24.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -987,15 +987,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1113,7 +1113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -1286,15 +1286,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1412,7 +1412,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -1459,15 +1459,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1585,7 +1585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -1614,6 +1614,39 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!1 &484220989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 484220990}
+  m_Layer: 0
+  m_Name: Village
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &484220990
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484220989}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 697381550}
+  - {fileID: 1754466201}
+  m_Father: {fileID: 536880755}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &494310209
 GameObject:
   m_ObjectHideFlags: 0
@@ -1805,7 +1838,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -2035,7 +2068,7 @@ Transform:
   m_GameObject: {fileID: 536880751}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -8.89, z: 0}
+  m_LocalPosition: {x: -3.9, y: -8.89, z: -24.4}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2048,6 +2081,7 @@ Transform:
   - {fileID: 1255382106}
   - {fileID: 17953371}
   - {fileID: 1772968277}
+  - {fileID: 484220990}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &541358671
@@ -2166,7 +2200,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -2320,6 +2354,76 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 603896493}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &697381549
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 484220990}
+    m_Modifications:
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.5649037
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.069867134
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.6853015
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400648179239735280, guid: abb22f475d17338409340abf39794509, type: 3}
+      propertyPath: m_Name
+      value: PT_House_01
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abb22f475d17338409340abf39794509, type: 3}
+--- !u!4 &697381550 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4400648179239506896, guid: abb22f475d17338409340abf39794509, type: 3}
+  m_PrefabInstance: {fileID: 697381549}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &704862450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2436,7 +2540,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -2905,7 +3009,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -3070,7 +3174,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -3400,7 +3504,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -3670,7 +3774,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -3744,7 +3848,7 @@ Transform:
   m_GameObject: {fileID: 1168325599}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -9.4, z: 0}
+  m_LocalPosition: {x: -3.9000015, y: -9.4, z: -24.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3875,15 +3979,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4001,7 +4105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -4153,15 +4257,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4279,7 +4383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -4424,7 +4528,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -4604,7 +4708,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -4695,7 +4799,7 @@ MonoBehaviour:
     sentences:
     - Hi, How are you?
     - I need some wood, only 5
-    - I will give you somthing in return
+    - I will give you something in return
     npcGivesPrize: 1
     prizeAmount: 50
     prize:
@@ -4964,6 +5068,7 @@ Transform:
   - {fileID: 1993851193}
   - {fileID: 922221987}
   - {fileID: 1665252429}
+  - {fileID: 2056536982}
   m_Father: {fileID: 1168325600}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1489129465
@@ -5125,15 +5230,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5248,7 +5353,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -5396,7 +5501,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -5561,7 +5666,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -5927,7 +6032,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -6092,7 +6197,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -6159,15 +6264,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6285,7 +6390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -6314,6 +6419,76 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!1001 &1754466200
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 484220990}
+    m_Modifications:
+    - target: {fileID: 224035203969777598, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_Name
+      value: PT_Barn_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.6914413
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.6936794
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+--- !u!4 &1754466201 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 599047436219753732, guid: 5e7be428edb25d644b5dac563f7386ae, type: 3}
+  m_PrefabInstance: {fileID: 1754466200}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1772968276
 GameObject:
   m_ObjectHideFlags: 0
@@ -6573,7 +6748,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -6690,6 +6865,175 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2056536978
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1446923983}
+    m_Modifications:
+    - target: {fileID: 6671002040370013786, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7136856956541039656, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.8236599
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7950455753586373333, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_Name
+      value: PT_Oak_Tree_03_green
+      objectReference: {fileID: 0}
+    - target: {fileID: 7950455753586373333, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8911726137227991392, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7950455753586373333, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2056536980}
+    - targetCorrespondingSourceObject: {fileID: 7950455753586373333, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2056536981}
+    - targetCorrespondingSourceObject: {fileID: 7950455753586373333, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2056536983}
+  m_SourcePrefab: {fileID: 100100000, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+--- !u!1 &2056536979 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7950455753586373333, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+  m_PrefabInstance: {fileID: 2056536978}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2056536980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056536979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 769855911
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &2056536981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056536979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5f29e3f8e44b40ff90e9cb74afc1e6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceName: Mangueira
+  startHealth: 100
+  currentHealth:
+    m_InternalValue: 0
+  resourceDrop: {fileID: 11400000, guid: 6b7fe85fe51494e869dc1c605533d5c2, type: 2}
+  amountDropFrom: 1
+  amountDropTo: 1
+  ToolBonus: 0
+  randomAmountToDrop:
+    m_InternalValue: 0
+--- !u!4 &2056536982 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7286368788420339823, guid: b45e378eaf8006844b97db33604bfebe, type: 3}
+  m_PrefabInstance: {fileID: 2056536978}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &2056536983
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056536979}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.16507968
+  m_Height: 5.6795945
+  m_Direction: 1
+  m_Center: {x: 0, y: 2.3397973, z: 0}
 --- !u!1001 &2094913575
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6708,15 +7052,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4077967732140251587, guid: fd4106af30c87a84cac7c06c207839d5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6834,7 +7178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceName: Arvore pine
-  startHealth: 500
+  startHealth: 150
   currentHealth:
     m_InternalValue: 0
   resourceDrop: {fileID: 11400000, guid: ec36694851274476f9bc537cbfc26baa, type: 2}
@@ -6979,7 +7323,7 @@ MonoBehaviour:
   startHealth: 0
   currentHealth:
     m_InternalValue: 0
-  resourceDrop: {fileID: 11400000, guid: cf354246423f14a19b1da58e0cd88072, type: 2}
+  resourceDrop: {fileID: 11400000, guid: c742aa8777440498b9cae22b9967cb3c, type: 2}
   amountDropFrom: 1
   amountDropTo: 1
   ToolBonus: 0
@@ -7047,6 +7391,14 @@ PrefabInstance:
     - target: {fileID: 683338927720522792, guid: 821ddab975d57486ba9c2d5b45ec07f9, type: 3}
       propertyPath: m_LocalPosition.z
       value: 28.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487371706465736754, guid: 821ddab975d57486ba9c2d5b45ec07f9, type: 3}
+      propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1487371706465736754, guid: 821ddab975d57486ba9c2d5b45ec07f9, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2030521865346897310, guid: 821ddab975d57486ba9c2d5b45ec07f9, type: 3}
       propertyPath: m_Name

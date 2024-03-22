@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51216d91b8dd441b480c96b298912413, type: 3}
+  m_Name: Mangueira Wood
+  m_EditorClassIdentifier: 
+  resourceType: 0
+  Name: Mangueira Wood
+  icon: {fileID: 21300000, guid: e37c58bddb0e2014b96d860ca4608423, type: 3}
+  id: 8
+  dropGameObject: {fileID: 4872178930830419935, guid: e5518f69ae5c14d3b9cbde37e442f840, type: 3}
+  goldValue: 10
+  weight: 5
+  informationText: Mangueira de belem
+  damage: 0
