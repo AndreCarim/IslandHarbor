@@ -202,8 +202,8 @@ public class DayCycleHandler : NetworkBehaviour
         if (directionalLight && skyboxMaterial)
         {
 
-            // Calculate current time in minutes
-            float currentHourValue = currentHour.Value + currentMinute.Value / 60f;
+            // Calculate current time in minutes including seconds
+            float currentHourValue = currentHour.Value + currentMinute.Value / 60f + currentSecond.Value / 3600f;
 
             // Calculate the transition time within each phase
             float transitionTime = 0f;
