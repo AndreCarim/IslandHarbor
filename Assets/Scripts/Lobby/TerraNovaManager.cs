@@ -274,6 +274,8 @@ public class TerraNovaManager : NetworkBehaviour
             NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
             NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += NetorkManager_Server_OnClientDiscconectCallback;
+            
+
             NetworkManager.Singleton.StartHost();
 
             if(playMultiplayer){
@@ -311,6 +313,8 @@ public class TerraNovaManager : NetworkBehaviour
         }
         
     }
+
+   
 
     private void NetorkManager_Client_OnClientConnectedCallback(ulong clientId){
         setPlayerNameServerRpc(getPlayerName());

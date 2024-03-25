@@ -93,6 +93,7 @@ public class PlayerReadyHandler : NetworkBehaviour
         OnReadyChange?.Invoke(this, EventArgs.Empty);
     }
 
+
     public bool IsPlayerReady(ulong clientId){
         return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
     }

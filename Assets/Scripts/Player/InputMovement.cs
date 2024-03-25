@@ -25,7 +25,7 @@ public class InputMovement : NetworkBehaviour
     private string currentAnimationState;
 
 
-  public float maxVelocityUpdate = 10f;
+    private float maxVelocityUpdate = 10f;
 
 
 
@@ -57,7 +57,7 @@ public class InputMovement : NetworkBehaviour
 
     
     
-    private void ProcessMove(Vector2 input) {
+   private void ProcessMove(Vector2 input) {
         if (isGrounded && playerVelocity.y < 0) {
             playerVelocity.y = -2f; // Reset vertical velocity when grounded
         }
@@ -89,6 +89,9 @@ public class InputMovement : NetworkBehaviour
         // Move the player using the character controller
         controller.Move(playerVelocity * Time.deltaTime);
     }
+
+
+
 
 
     public void Jump(){
